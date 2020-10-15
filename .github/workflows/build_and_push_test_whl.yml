@@ -1,12 +1,9 @@
-name: Build and push WHL to test pypi
+name: Build-and-push-WHL-test-pypi
 
 on:
   workflow_run:
-    workflows:
-      - Test
-    branches:
-      - test
-      - devops
+    workflows: ["Test"]
+    branches: [test, devops]
     types:
       - completed
 
