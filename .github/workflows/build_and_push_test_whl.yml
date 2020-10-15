@@ -1,13 +1,14 @@
 name: Build and push WHL to test pypi
 
 on:
-  completion:
-    success:
+  workflow_run:
+    workflows:
       - Test
-  push:
     branches:
       - test
       - devops
+    types:
+      - completed
 
 jobs:
   Build_WHL:
