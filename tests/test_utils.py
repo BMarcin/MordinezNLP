@@ -1,6 +1,6 @@
 import unittest
 
-from src import ngram_iterator
+from src.MordinezNLP import ngram_iterator
 
 
 class UtilsTests(unittest.TestCase):
