@@ -46,6 +46,7 @@ jobs:
         run: docker run mordineznlp:test-p36
 
   Build_WHL:
+    needs: [Test_python_38, Test_python_37, Test_python_36]
     if: github.ref == 'refs/heads/test' || github.ref == 'refs/heads/devops'
     runs-on: ubuntu-latest
 
@@ -60,7 +61,7 @@ jobs:
         run: docker build -f docker/buildWHL.Dockerfile . -t mordineznlp:whl-builder
 
       - name: Build WHL
-        run: docker run -v ./dist:/usr/src/app/dist mordineznlp:whl-builder
+        run: docker run -v /home/runner/work/MordinezNLP/MordinezNLP/dist:/usr/src/app/dist mordineznlp:whl-builder
 
       - name: Archive WHL
         uses: actions/upload-artifact@v2
