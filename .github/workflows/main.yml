@@ -1,4 +1,4 @@
-name: Test
+name: WHL Package
 
 on:
   push:
@@ -66,5 +66,22 @@ jobs:
       - name: Archive WHL
         uses: actions/upload-artifact@v2
         with:
-          name: source-whl
+          name: MordinezNLP-WHL
           path: dist/
+
+  Publish_WHL_test_pypi:
+    needs: Build_WHL
+    if: github.ref == 'refs/heads/test' || github.ref == 'refs/heads/devops'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download WHL artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: MordinezNLP-WHL
+
+      - name: ls
+        run: ls -la
