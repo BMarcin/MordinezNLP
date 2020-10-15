@@ -16,5 +16,10 @@ jobs:
       - name: Docker build image
         run: docker build -f docker/run_tests_python_38.Dockerfile . -t mordineznlp:test-p38
 
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Docker run tests
         run: docker run mordineznlp:test-p38
