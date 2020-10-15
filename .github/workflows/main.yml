@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  Test python 3.8:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,10 +16,22 @@ jobs:
       - name: Docker build image
         run: docker build -f docker/run_tests_python_38.Dockerfile . -t mordineznlp:test-p38
 
-  test:
-    needs: build
+  Test python 3.7:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Docker run tests
-        run: docker run mordineznlp:test-p38
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Docker build image
+        run: docker build -f docker/run_tests_python_37.Dockerfile . -t mordineznlp:test-p37
+
+  Test python 3.6:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Docker build image
+        run: docker build -f docker/run_tests_python_36.Dockerfile . -t mordineznlp:test-p36
