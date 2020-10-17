@@ -87,5 +87,10 @@ jobs:
           name: MordinezNLP-WHL
           path: dist/
 
-      - name: ls
-        run: ls -la
+      - name: Build Docker builder
+        run: docker build -f docker/publish_WHL.Dockerfile . -t mordineznlp:whl-publisher
+
+      - name: Build WHL
+        run: docker run  --env PYPIPASS=${PYPIPASS} --env PYPIREPO=testpypi mordineznlp:whl-publisher
+        env:
+          PYPIPASS: ${{ secrets.PYPIPASS_TEST }}

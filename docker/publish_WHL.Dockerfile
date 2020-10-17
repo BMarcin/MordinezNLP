@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 CMD python -m pip install --user --upgrade twine && \
-    python -m twine upload --repository testpypi dist/* --username=__token__ --password=${GITHUB_TOKEN}
+    python -m twine upload --repository=${PYPIREPO} dist/* --username=__token__ --password=${PYPIPASS}
