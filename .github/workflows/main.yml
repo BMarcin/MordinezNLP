@@ -58,7 +58,7 @@ jobs:
         run: mkdir dist
 
       - name: Build Docker builder
-        run: docker build -f docker/buildWHL.Dockerfile . -t mordineznlp:whl-builder
+        run: docker build -f docker/build_WHL.Dockerfile . -t mordineznlp:whl-builder
 
       - name: Build WHL
         run: docker run -v /home/runner/work/MordinezNLP/MordinezNLP/dist:/usr/src/app/dist mordineznlp:whl-builder
@@ -78,10 +78,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: mkdir dist
+        run: mkdir dist
+
       - name: Download WHL artifact
         uses: actions/download-artifact@v2
         with:
           name: MordinezNLP-WHL
+          path: dist/
 
       - name: ls
         run: ls -la
