@@ -1,3 +1,5 @@
+import os
+
 import setuptools
 
 with open("README.md", "r") as fh:
@@ -5,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="MordinezNLP",
-    version="0.0.1",
+    version=os.environ['PACKAGEVERSION'],
     author='Marcin Borzymowski',
     description='Powerfull python tool for modern NLP processing',
     long_description=long_description,

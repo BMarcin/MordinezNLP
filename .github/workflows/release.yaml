@@ -1,0 +1,53 @@
+name: Release to test pypi
+
+on:
+  release:
+    types: [published, prereleased]
+
+jobs:
+  Build_WHL:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: mkdir dist
+        run: mkdir dist
+
+      - name: Build Docker builder
+        run: docker build -f docker/build_WHL.Dockerfile . -t mordineznlp:whl-builder
+
+      - name: Build WHL
+        run: docker run -e PACKAGEVERSION=${GITHUB_REF##*/} -v /home/runner/work/MordinezNLP/MordinezNLP/dist:/usr/src/app/dist mordineznlp:whl-builder
+
+      - name: Archive WHL
+        uses: actions/upload-artifact@v2
+        with:
+          name: MordinezNLP-WHL
+          path: dist/
+
+  Publish_WHL_pypi:
+    needs: Build_WHL
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: mkdir dist
+        run: mkdir dist
+
+      - name: Download WHL artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: MordinezNLP-WHL
+          path: dist/
+
+      - name: Build Docker builder
+        run: docker build -f docker/publish_WHL.Dockerfile . -t mordineznlp:whl-publisher
+
+      - name: Build WHL
+        run: docker run -e PACKAGEVERSION=${GITHUB_REF##*/} --env PYPIPASS=${PYPIPASS} --env PYPIREPO=testpypi mordineznlp:whl-publisher
+        env:
+          PYPIPASS: ${{ secrets.PYPIPASS_TEST }}
