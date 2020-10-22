@@ -44,3 +44,25 @@ jobs:
 
       - name: Test code
         run: docker run mordineznlp:test-p36
+
+  Build_WHL:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: mkdir dist
+        run: mkdir dist
+
+      - name: Build Docker builder
+        run: docker build -f docker/build_WHL.Dockerfile . -t mordineznlp:whl-builder
+
+      - name: Build WHL
+        run: docker run -e PACKAGEVERSION=${GITHUB_REF##*/} -v /home/runner/work/MordinezNLP/MordinezNLP/dist:/usr/src/app/dist mordineznlp:whl-builder
+
+      - name: Archive WHL
+        uses: actions/upload-artifact@v2
+        with:
+          name: MordinezNLP-WHL
+          path: dist/

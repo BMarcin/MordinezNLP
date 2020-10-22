@@ -2,7 +2,7 @@ name: Release to test pypi
 
 on:
   release:
-    types: [published, prereleased]
+    types: [published]
 
 jobs:
   Build_WHL:
@@ -48,6 +48,6 @@ jobs:
         run: docker build -f docker/publish_WHL.Dockerfile . -t mordineznlp:whl-publisher
 
       - name: Build WHL
-        run: docker run -e PACKAGEVERSION=${GITHUB_REF##*/} --env PYPIPASS=${PYPIPASS} --env PYPIREPO=testpypi mordineznlp:whl-publisher
+        run: docker run -e PACKAGEVERSION=${GITHUB_REF##*/} --env PYPIPASS=${PYPIPASS} --env PYPIREPO=pypi mordineznlp:whl-publisher
         env:
-          PYPIPASS: ${{ secrets.PYPIPASS_TEST }}
+          PYPIPASS: ${{ secrets.PYPIPASS }}
