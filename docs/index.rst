@@ -11,6 +11,8 @@ Welcome to MordinezNLP's documentation!
    :caption: Contents:
 
    utils
+   downloaders_processors
+   parsers_pdf
 
 Indices and tables
 ==================

@@ -1,5 +1,5 @@
 Utils
 ===============
 
-.. automodule:: utils.ngram_iterator
-   :members:
+.. automodule:: MordinezNLP.utils.ngram_iterator
+    :members:
