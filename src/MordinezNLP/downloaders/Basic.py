@@ -1,6 +1,5 @@
 import io
 import time
-import urllib
 from itertools import repeat
 from multiprocessing import Pool
 
@@ -8,14 +7,48 @@ from typing import List
 
 import requests
 
-from src.MordinezNLP.downloaders import text_data_processor, pdf_data_processor
+from .Processors import text_data_processor, pdf_data_processor
 
 
 class BasicDownloader:
+    """
+    Class helps to download multiple files from list of provided links using multithreading.
+    """
     def __init__(self):
         pass
 
-    def download_urls(self, urls: List[str], file_type_handler, threads: int = 8, sleep_time: int = 0) -> list:
+    @staticmethod
+    def download_urls(
+            urls: List[str],
+            file_type_handler,
+            threads: int = 8,
+            sleep_time: int = 0,
+            custom_headers: dict = {},
+            streamable: bool = False,
+            max_retries: int = 10
+    ) -> list:
+        """
+        Function allows user to download files from provided URLs in list. Each file is downloaded as BytesIO using
+        specified number of threads and then *file_type_handler* is used to convert file from BytesIO to specified
+        format. Each file type should have its own *file_type_handler*.
+
+        Sleep_time is used to prevent sites from detecting DDoS attacks. Before downloading file specified thread
+        is going to sleep for specified amount of time.
+
+        Function for each thread (and for each single URL) uses *download_to_bytes_io* function.
+
+        Args:
+            urls (List[str]): List of URLs of files to download
+            file_type_handler: Function used to convert downloaded file to a specified format
+            threads (int): Number of threads to download files
+            sleep_time (int): Time used to prevent file downloads from being detected as DDoS attack
+            max_retries (int): Refer to *download_to_bytes_io* function documentation.
+            streamable (bool): Refer to *download_to_bytes_io* function documentation.
+            custom_headers (int): Refer to *download_to_bytes_io* function documentation.
+
+        Returns:
+            A list of downloaded and processed by *file_type_handler* function files.
+        """
         with Pool(threads) as p:
             downloaded_strings = p.starmap(BasicDownloader.download_to_bytes_io, zip(urls, repeat(sleep_time)))
             return [file_type_handler(item) for item in downloaded_strings]
@@ -29,14 +62,21 @@ class BasicDownloader:
             max_retries: int = 10
     ) -> io.BytesIO:
         """
-        Function makes GET request to a specified URL. If there is an exception function will try to download
-        file untill it will be successful.
+        Function defines how to download single URL. It is used by *download_urls* function to use Threading for
+        multithread downloading.
+
+        Function makes GET request to a specified URL. If there is an exception, the function will try to download
+        file untill it will be successful or until it reaches 10 unsucessful downloads
 
         Args:
+            max_retries (int): How many retries function will make until it marks a file undownloadable
+            sleep_time (int): A sleep time in seconds that is used to prevent sites from detecting downloading as a DDoS attack
+            streamable (bool): Sets a *request*'s *stream* parameter. More info https://2.python-requests.org/en/v2.8.1/user/advanced/#body-content-workflow
+            custom_headers (bool): Custom headers used in each request
             url (str): valid HTTP/HTTPS URL
 
-        Returns: downloaded file as a string
-
+        Returns:
+            downloaded file as a string
         """
         # make list from one URL
         url_list = [url]
@@ -70,9 +110,9 @@ class BasicDownloader:
 
 
 if __name__ == '__main__':
-    bd = BasicDownloader()
-    # print(bd.download_to_bytes_io("https://raw.githubusercontent.com/BMarcin/MordinezNLP/main/requirements.txt", lambda x: x.read().decode('utf8')))
-    downloaded_elements = bd.download_urls(
+    # bd = BasicDownloader()
+
+    downloaded_elements = BasicDownloader.download_urls(
         [
             "https://raw.githubusercontent.com/BMarcin/MordinezNLP/main/requirements.txt",
             "https://raw.githubusercontent.com/BMarcin/MordinezNLP/main/LICENSE"
@@ -80,7 +120,7 @@ if __name__ == '__main__':
         lambda x: text_data_processor(x),
     )
 
-    downloaded_pdfs = bd.download_urls(
+    downloaded_pdfs = BasicDownloader.download_urls(
         [
             "https://docs.whirlpool.eu/_doc/19514904100_PL.pdf",
             "https://mpm.pl/docs/_instrukcje/WA-6040S_instrukcja.pdf",

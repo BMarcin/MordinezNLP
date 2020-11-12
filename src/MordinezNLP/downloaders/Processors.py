@@ -13,7 +13,7 @@ def text_data_processor(data: BytesIO) -> str:
     Returns:
         string - which is parsed input
     """
-    return data.read().decode('utf8')
+    return data.read().decode('utf8').replace("\r", "")
 
 
 def pdf_data_processor(data: BytesIO) -> str:

@@ -10,9 +10,10 @@ Welcome to MordinezNLP's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   utils
+   downloaders_basic
    downloaders_processors
    parsers_pdf
+   utils
 
 Indices and tables
 ==================
