@@ -3,8 +3,8 @@
 <p>
 
 <p align="center">
-    <a href="https://github.com/BMarcin/MordinezNLP/blob/main/.github/workflows/test.yml">
-        <img alt="GitHub" src="https://img.shields.io/github/workflow/status/BMarcin/MordinezNLP/Test?label=Tests">
+    <a href="https://github.com/BMarcin/MordinezNLP/blob/main/.github/workflows/tests.yml">
+        <img alt="GitHub" src="https://img.shields.io/github/workflow/status/BMarcin/MordinezNLP/Tests?label=Tests">
     </a>
     <a href="https://github.com/BMarcin/MordinezNLP/blob/main/LICENSE">
         <img alt="GitHub" src="https://img.shields.io/github/license/BMarcin/MordinezNLP">
