@@ -3,7 +3,7 @@ import time
 from itertools import repeat
 from multiprocessing import Pool
 
-from typing import List
+from typing import List, Iterable
 
 import requests
 
@@ -27,8 +27,8 @@ class BasicDownloader:
             file_type_handler,
             threads: int = 8,
             sleep_time: int = 0,
-            custom_headers: List[dict] = repeat({}),
-            streamable: List[bool] = False,
+            custom_headers: Iterable = repeat({}),
+            streamable: Iterable = repeat(False),
             max_retries: int = 10
     ) -> list:
         # todo update docs
@@ -55,8 +55,15 @@ class BasicDownloader:
             A list of downloaded and processed by *file_type_handler* function files.
         """
         with Pool(threads) as p:
-            downloaded_strings = p.starmap(BasicDownloader.download_to_bytes_io, zip(
-                urls, custom_headers, streamable, repeat(sleep_time), repeat(max_retries)))
+            downloaded_strings = p.starmap(
+                BasicDownloader.download_to_bytes_io, zip(
+                    urls,
+                    custom_headers,
+                    streamable,
+                    repeat(sleep_time),
+                    repeat(max_retries)
+                )
+            )
             return [file_type_handler(item) for item in downloaded_strings]
 
     @staticmethod

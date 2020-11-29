@@ -3,7 +3,7 @@ import unittest
 from io import BytesIO
 
 from helper import BASE_DIR
-from src.MordinezNLP.downloaders import BasicDownloader
+from src.MordinezNLP.downloaders import BasicDownloader, CommonCrawlDownloader
 from src.MordinezNLP.downloaders.Processors import text_data_processor, gzip_to_text_data_processor
 
 
@@ -72,6 +72,43 @@ class BasicDownloaderTests(unittest.TestCase):
         )
 
         self.assertEqual(file_contents, downloaded_data)
+
+
+class CommonCrawlDownloaderTests(unittest.TestCase):
+    def test_commoncrawl_downloader(self):
+        ccd = CommonCrawlDownloader(
+            [
+                "reddit.com/r/rareinsults/comments/gonsta/quite_the_fall_from_olympus*"
+            ]
+        )
+        ccd.download(
+            os.path.join(
+                BASE_DIR,
+                "tests",
+                "common_crawl_downloader_test"
+            )
+        )
+
+        with open(
+                os.path.join(
+                    BASE_DIR,
+                    "tests",
+                    "resources",
+                    "test_downloaders",
+                    "CC-MAIN-20200527204212-20200527234212-00365-863470622-863551018.txt"
+                ),
+                encoding="utf8") as f:
+            file_content = f.read()
+
+            with open(
+                    os.path.join(
+                        BASE_DIR,
+                        "tests",
+                        "common_crawl_downloader_test",
+                        "CC-MAIN-20200527204212-20200527234212-00365-863470622-863551018.txt"
+                    ),
+                    encoding="utf8") as f2:
+                self.assertEqual(f2.read(), file_content)
 
 
 if __name__ == '__main__':

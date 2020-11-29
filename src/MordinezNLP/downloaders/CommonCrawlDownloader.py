@@ -1,34 +1,37 @@
 import json
+import os
 import urllib.parse
+from io import BytesIO
+from itertools import repeat
 from typing import List
 
 try:
-    from src.MordinezNLP.downloaders.Processors import text_data_processor
+    from src.MordinezNLP.downloaders.Processors import text_data_processor, gzip_to_text_data_processor
     from src.MordinezNLP.downloaders import BasicDownloader
 except:
     from .Basic import BasicDownloader
     from .Processors import text_data_processor
 
 
+# todo add docs
 class CommonCrawlDownloader:
     def __init__(
             self,
             links_to_search: List[str],
             index_name: str = "CC-MAIN-2020-24",
-            base_url: str = "http://index.commoncrawl.org",
+            base_index_url: str = "http://index.commoncrawl.org",
             search_for_mime: str = 'text/html',
             search_for_language: str = 'eng',
             threads=8
     ):
         self.links_to_search = links_to_search
         self.index_name = index_name
-        self.base_url = base_url
+        self.base_index_url = base_index_url
         self.search_for_mime = search_for_mime
         self.search_for_language = search_for_language
         self.threads = threads
 
         self.entries_to_download = self._get_sources_for_urls()
-        # print(self.entries_to_download)
 
     def _get_sources_for_urls(self):
         # preprocess links to use BasicDownloader
@@ -36,7 +39,7 @@ class CommonCrawlDownloader:
         for url in self.links_to_search:
             pre_url = urllib.parse.quote(url, safe='')
             post_url = "{base_url}/{index_name}-index?url={pre_url}&output=json".format(
-                base_url=self.base_url,
+                base_url=self.base_index_url,
                 index_name=self.index_name,
                 pre_url=pre_url
             )
@@ -62,13 +65,17 @@ class CommonCrawlDownloader:
                             entries_to_download.append(parsed_item)
         return entries_to_download
 
-    def download(self, file_save_path):
+    @staticmethod
+    def _custom_gzip_to_text_processor(data_in: BytesIO) -> str:
+        return gzip_to_text_data_processor(data_in).strip().split("\r\n\r\n", 2)[2]
+
+    def download(self, save_to: str, base_url: str = "https://commoncrawl.s3.amazonaws.com", sleep_time: int = 0):
         entries_to_download = []
 
         for entry in self.entries_to_download:
             filename = entry['filename']
-            offset = entry['offset']
-            length = entry['length']
+            offset = int(entry['offset'])
+            length = int(entry['length'])
 
             offset_end = offset + length - 1
 
@@ -83,7 +90,7 @@ class CommonCrawlDownloader:
             )
 
             entry_dict = {
-                'url': filename,
+                'url': "{}/{}".format(base_url, filename),
                 'headers': headers,
                 'save_to': filename_to_save_entry
             }
@@ -94,19 +101,23 @@ class CommonCrawlDownloader:
         bd = BasicDownloader()
         downloaded_content = bd.download_urls(
             [entry['url'] for entry in entries_to_download],
-            text_data_processor
+            CommonCrawlDownloader._custom_gzip_to_text_processor,
+            custom_headers=[entry['headers'] for entry in entries_to_download],
+            streamable=repeat(True)
         )
 
+        if not os.path.exists(save_to):
+            os.mkdir(save_to)
 
-
-
+        for filename, entry in zip([entry['save_to'] for entry in entries_to_download], downloaded_content):
+            with open(os.path.join(save_to, filename), "w", encoding="utf8") as f:
+                f.write(entry)
 
 
 if __name__ == '__main__':
     ccd = CommonCrawlDownloader(
         [
-            "reddit.com/r/space/*",
-            "reddit.com/r/spacex/*"
-        ],
-        "./data/"
+            "reddit.com/r/rareinsults/comments/gonsta/quite_the_fall_from_olympus*"
+        ]
     )
+    ccd.download('./test_data')
