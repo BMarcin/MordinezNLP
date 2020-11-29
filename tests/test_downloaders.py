@@ -4,7 +4,7 @@ from io import BytesIO
 
 from helper import BASE_DIR
 from src.MordinezNLP.downloaders import BasicDownloader
-from src.MordinezNLP.downloaders.Processors import text_data_processor
+from src.MordinezNLP.downloaders.Processors import text_data_processor, gzip_to_text_data_processor
 
 
 class ProcessorsTests(unittest.TestCase):
@@ -30,6 +30,18 @@ and also german: äöüß"""
         with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_2.txt"), "r") as f:
             file_content = text_data_processor(BytesIO(f.read().encode("utf8")))
         self.assertEqual(file_content, self.text_file_2)
+
+    def test_gzip_processor_file_1(self):
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_1.txt.gz"), "rb") as f:
+            with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_1.txt"), "r") as f2:
+                file_content = f2.read()
+                self.assertEqual(file_content, gzip_to_text_data_processor(BytesIO(f.read())))
+
+    def test_gzip_processor_file_2(self):
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_2.txt.gz"), "rb") as f:
+            with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_2.txt"), "r") as f2:
+                file_content = f2.read()
+                self.assertEqual(file_content, gzip_to_text_data_processor(BytesIO(f.read())))
 
 
 class BasicDownloaderTests(unittest.TestCase):

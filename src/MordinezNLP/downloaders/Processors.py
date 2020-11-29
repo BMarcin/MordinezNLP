@@ -1,3 +1,4 @@
+import gzip
 from io import BytesIO
 
 from ..parsers import process_pdf
@@ -27,4 +28,20 @@ def pdf_data_processor(data: BytesIO) -> str:
         string - which is parsed input, more informations about parsing PDFs can be found in method
         MordinezNLP.parsers.process_pdf
     """
-    return process_pdf(data)
+    return "\n".join(process_pdf(data))
+
+
+def gzip_to_text_data_processor(data: BytesIO) -> str:
+    """
+    Function can be used together with downloaders to covnert BytesIO to GZIP and unpack it to str.
+
+    Args:
+        data (BytesIO): input data which comes from downlaoder class/function
+
+    Returns:
+        string - which is parsed input
+    """
+    unzipped_file = gzip.GzipFile(fileobj=data)
+    raw_data = unzipped_file.read()
+
+    return raw_data.decode("utf8")

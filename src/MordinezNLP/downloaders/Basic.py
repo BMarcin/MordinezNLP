@@ -7,13 +7,17 @@ from typing import List
 
 import requests
 
-from .Processors import text_data_processor, pdf_data_processor
+try:
+    from src.MordinezNLP.downloaders.Processors import text_data_processor, pdf_data_processor
+except:
+    from .Processors import text_data_processor, pdf_data_processor
 
 
 class BasicDownloader:
     """
     Class helps to download multiple files from list of provided links using multithreading.
     """
+
     def __init__(self):
         pass
 
@@ -23,10 +27,11 @@ class BasicDownloader:
             file_type_handler,
             threads: int = 8,
             sleep_time: int = 0,
-            custom_headers: dict = {},
-            streamable: bool = False,
+            custom_headers: List[dict] = repeat({}),
+            streamable: List[bool] = False,
             max_retries: int = 10
     ) -> list:
+        # todo update docs
         """
         Function allows user to download files from provided URLs in list. Each file is downloaded as BytesIO using
         specified number of threads and then *file_type_handler* is used to convert file from BytesIO to specified
@@ -50,7 +55,8 @@ class BasicDownloader:
             A list of downloaded and processed by *file_type_handler* function files.
         """
         with Pool(threads) as p:
-            downloaded_strings = p.starmap(BasicDownloader.download_to_bytes_io, zip(urls, repeat(sleep_time)))
+            downloaded_strings = p.starmap(BasicDownloader.download_to_bytes_io, zip(
+                urls, custom_headers, streamable, repeat(sleep_time), repeat(max_retries)))
             return [file_type_handler(item) for item in downloaded_strings]
 
     @staticmethod
@@ -59,7 +65,7 @@ class BasicDownloader:
             custom_headers: dict = {},
             streamable: bool = False,
             sleep_time: int = 0,
-            max_retries: int = 10
+            max_retries: int = 10,
     ) -> io.BytesIO:
         """
         Function defines how to download single URL. It is used by *download_urls* function to use Threading for
