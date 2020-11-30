@@ -22,24 +22,24 @@ It contains special characters like: ąęźżćłó;@!#G:SDFGMN"};l.;,`13/-+
 and also german: äöüß"""
 
     def test_text_file_1(self):
-        with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_1.txt"), "r") as f:
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_1.txt"), "r", encoding="utf8") as f:
             file_content = text_data_processor(BytesIO(f.read().encode("utf8")))
         self.assertEqual(file_content, self.text_file_1)
 
     def test_text_file_2(self):
-        with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_2.txt"), "r") as f:
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_2.txt"), "r", encoding="utf8") as f:
             file_content = text_data_processor(BytesIO(f.read().encode("utf8")))
         self.assertEqual(file_content, self.text_file_2)
 
     def test_gzip_processor_file_1(self):
         with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_1.txt.gz"), "rb") as f:
-            with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_1.txt"), "r") as f2:
+            with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_1.txt"), "r", encoding="utf8") as f2:
                 file_content = f2.read()
                 self.assertEqual(file_content, gzip_to_text_data_processor(BytesIO(f.read())))
 
     def test_gzip_processor_file_2(self):
         with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_2.txt.gz"), "rb") as f:
-            with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_2.txt"), "r") as f2:
+            with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_2.txt"), "r", encoding="utf8") as f2:
                 file_content = f2.read()
                 self.assertEqual(file_content, gzip_to_text_data_processor(BytesIO(f.read())))
 
