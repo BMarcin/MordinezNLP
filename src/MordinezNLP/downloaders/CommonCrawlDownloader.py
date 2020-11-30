@@ -67,7 +67,8 @@ class CommonCrawlDownloader:
 
     @staticmethod
     def _custom_gzip_to_text_processor(data_in: BytesIO) -> str:
-        return gzip_to_text_data_processor(data_in).strip().split("\r\n\r\n", 2)[2]
+        gzipped_data = gzip_to_text_data_processor(data_in)
+        return gzipped_data.strip().split("\n\n", 2)[2]
 
     def download(self, save_to: str, base_url: str = "https://commoncrawl.s3.amazonaws.com", sleep_time: int = 0):
         entries_to_download = []
