@@ -35,13 +35,15 @@ and also german: äöüß"""
         with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_1.txt.gz"), "rb") as f:
             with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_1.txt"), "r", encoding="utf8") as f2:
                 file_content = f2.read()
-                self.assertEqual(file_content, gzip_to_text_data_processor(BytesIO(f.read())))
+                gzip_file_content = gzip_to_text_data_processor(BytesIO(f.read()))
+                self.assertEqual(file_content,gzip_file_content )
 
     def test_gzip_processor_file_2(self):
         with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_2.txt.gz"), "rb") as f:
             with open(os.path.join(BASE_DIR, "tests", "resources", "test_downloaders", "text_file_2.txt"), "r", encoding="utf8") as f2:
                 file_content = f2.read()
-                self.assertEqual(file_content, gzip_to_text_data_processor(BytesIO(f.read())))
+                gzip_file_content = gzip_to_text_data_processor(BytesIO(f.read()))
+                self.assertEqual(file_content, gzip_file_content)
 
 
 class BasicDownloaderTests(unittest.TestCase):
