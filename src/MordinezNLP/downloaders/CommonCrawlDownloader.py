@@ -117,7 +117,8 @@ class CommonCrawlDownloader:
 if __name__ == '__main__':
     ccd = CommonCrawlDownloader(
         [
-            "reddit.com/r/rareinsults/comments/gonsta/quite_the_fall_from_olympus*"
+            "reddit.com/r/space/*",
+            "reddit.com/r/spacex/*",
         ]
     )
     ccd.download('./test_data')
