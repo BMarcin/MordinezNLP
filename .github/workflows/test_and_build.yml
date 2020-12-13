@@ -92,4 +92,50 @@ jobs:
         run: docker build -f docker/run_tests_python_36_WHL.Dockerfile . -t mordineznlp:test-p36-whl
 
       - name: Test code
-        run: docker run mordineznlp:test-p36
+        run: docker run mordineznlp:test-p36-whl
+
+  Test_python_37_WHL:
+    runs-on: ubuntu-latest
+    needs: [ Build_WHL ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: mkdir
+        run: mkdir whl_package
+
+      - name: Download WHL artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: MordinezNLP-WHL
+          path: whl_package/
+
+      - name: Docker build image
+        run: docker build -f docker/run_tests_python_37_WHL.Dockerfile . -t mordineznlp:test-p37-whl
+
+      - name: Test code
+        run: docker run mordineznlp:test-p37-whl
+
+  Test_python_38_WHL:
+    runs-on: ubuntu-latest
+    needs: [ Build_WHL ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: mkdir
+        run: mkdir whl_package
+
+      - name: Download WHL artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: MordinezNLP-WHL
+          path: whl_package/
+
+      - name: Docker build image
+        run: docker build -f docker/run_tests_python_38_WHL.Dockerfile . -t mordineznlp:test-p38-whl
+
+      - name: Test code
+        run: docker run mordineznlp:test-p38-whl
