@@ -21,11 +21,14 @@ jobs:
       - name: Build WHL
         run: docker run -e PACKAGEVERSION=${GITHUB_REF##*/} -v /home/runner/work/MordinezNLP/MordinezNLP/dist:/usr/src/app/dist mordineznlp:whl-builder
 
+      - name: Move WHL
+        run: mkdir whl_package && cp dist/*.whl whl_package/
+
       - name: Archive WHL
         uses: actions/upload-artifact@v2
         with:
           name: MordinezNLP-WHL
-          path: dist/
+          path: whl_package/
 
   Publish_WHL_pypi:
     needs: Build_WHL
