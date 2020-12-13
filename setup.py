@@ -5,9 +5,16 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
+def read_requirements():
+    with open("requirements.txt") as f:
+        return [line.replace("\n", "") for line in f.readlines()]
+
+
 setuptools.setup(
     name="MordinezNLP",
     version=os.environ['PACKAGEVERSION'],
+    install_requires=read_requirements(),
     author='Marcin Borzymowski',
     description='Powerfull python tool for modern NLP processing',
     long_description=long_description,
