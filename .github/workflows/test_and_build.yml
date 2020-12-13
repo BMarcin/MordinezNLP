@@ -73,6 +73,7 @@ jobs:
 
   Test_python_36_WHL:
     runs-on: ubuntu-latest
+    needs: [Build_WHL]
 
     steps:
       - name: Checkout code
