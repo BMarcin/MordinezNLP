@@ -11,6 +11,7 @@ Welcome to MordinezNLP's documentation!
    :caption: Contents:
 
    downloaders_basic
+   downloaders_commoncrawl
    downloaders_processors
    parsers_pdf
    utils
