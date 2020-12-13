@@ -46,6 +46,8 @@ Disallow: /shenghuo
 Allow: /shop$
 Allow: /shop?
 Allow: /shop/
+Allow: /stores$
+Allow: /stores/
 Disallow: /social/search?
 Disallow: /spbasic
 Disallow: /spresults
@@ -92,3 +94,4 @@ Sitemap: https://www.bing.com/travelguide/sitemaps/sitemap.xml
 Sitemap: https://www.bing.com/maps/sitemap.xml
 Sitemap: https://bingknowsblob.blob.core.windows.net/bingknows/sitemaps/sitemapIndex.xml.gz
 Sitemap: https://www.bing.com/sitemap/shop/sitemap.xml
+Sitemap: https://www.bing.com/stores/sitemap
