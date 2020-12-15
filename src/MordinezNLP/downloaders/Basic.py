@@ -31,7 +31,6 @@ class BasicDownloader:
             streamable: Iterable = repeat(False),
             max_retries: int = 10
     ) -> list:
-        # todo update docs
         """
         Function allows user to download files from provided URLs in list. Each file is downloaded as BytesIO using
         specified number of threads and then *file_type_handler* is used to convert file from BytesIO to specified

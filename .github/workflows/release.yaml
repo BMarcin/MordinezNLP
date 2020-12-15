@@ -2,7 +2,7 @@ name: Release to test pypi
 
 on:
   release:
-    types: [published]
+    types: [published, created, prereleased]
 
 jobs:
   Build_WHL:

@@ -21,4 +21,4 @@ def ngram_iterator(string: str, ngram_len: int = 3) -> list:
 
 
 if __name__ == '__main__':
-    print(list(ngram_iterator("<hello>", 100)))
+    print(list(ngram_iterator("<hello>", 3)))

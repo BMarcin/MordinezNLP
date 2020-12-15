@@ -17,6 +17,7 @@ class CommonCrawlDownloader:
     """
     Class used to download common crawl data using Basic multithreaded downloader.
     """
+
     def __init__(
             self,
             links_to_search: List[str],
@@ -95,6 +96,7 @@ class CommonCrawlDownloader:
     def _common_crawl_gzip_to_text_processor(data_in: BytesIO) -> str:
         """
         Function is a wrapper for *gzip_to_text_data_processor*. For CC gzips we need to remove crawler metadata, so function strips, splits data and returs just a crawled html source.
+
         Args:
             data_in (BytesIO): a downloaded bytes
 
@@ -105,6 +107,14 @@ class CommonCrawlDownloader:
         return gzipped_data.strip().split("\n\n", 2)[2]
 
     def download(self, save_to: str, base_url: str = "https://commoncrawl.s3.amazonaws.com", sleep_time: int = 0):
+        """
+        Main function used to download CC data using multithreaded Base Downloader.
+
+        Args:
+            save_to (str): path to a folder where the data will be downloaded. Each file is a HTML document downloaded from CC.
+            base_url (str):  base CC URL for example: https://commoncrawl.s3.amazonaws.com
+            sleep_time (int):  A sleep time in seconds that is used to prevent sites from detecting downloading as a DDoS attack
+        """
         entries_to_download = []
 
         for entry in self.entries_to_download:
@@ -138,7 +148,8 @@ class CommonCrawlDownloader:
             [entry['url'] for entry in entries_to_download],
             CommonCrawlDownloader._common_crawl_gzip_to_text_processor,
             custom_headers=[entry['headers'] for entry in entries_to_download],
-            streamable=repeat(True)
+            streamable=repeat(True),
+            sleep_time=sleep_time
         )
 
         if not os.path.exists(save_to):

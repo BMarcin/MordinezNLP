@@ -76,7 +76,7 @@ def process_pdf(pdf_input: BytesIO) -> List[str]:
 
 
 if __name__ == '__main__':
-    with open("../../../tests/resources/test_parsers/test_doc_3.pdf", "rb") as f:
+    with open("../../../tests/resources/test_parsers/test_doc_3+.pdf", "rb") as f:
         pdf = BytesIO(f.read())
     output = process_pdf(pdf)
     print(output)
