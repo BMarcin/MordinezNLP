@@ -39,8 +39,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: mkdir dist
-        run: mkdir dist
+      - name: mkdir whl_package
+        run: mkdir whl_package
 
       - name: Download WHL artifact
         uses: actions/download-artifact@v2
