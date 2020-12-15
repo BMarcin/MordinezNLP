@@ -10,7 +10,7 @@ try:
     from src.MordinezNLP.downloaders import BasicDownloader
 except:
     from .Basic import BasicDownloader
-    from .Processors import text_data_processor
+    from .Processors import text_data_processor, gzip_to_text_data_processor
 
 
 class CommonCrawlDownloader:

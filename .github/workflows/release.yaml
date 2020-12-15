@@ -13,8 +13,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: mkdir dist
-        run: mkdir dist
+      - name: mkdir whl_package
+        run: mkdir whl_package
 
       - name: Build Docker builder
         run: docker build -f docker/build_WHL.Dockerfile . -t mordineznlp:whl-builder
@@ -23,7 +23,7 @@ jobs:
         run: docker run -e PACKAGEVERSION=${GITHUB_REF##*/} -v /home/runner/work/MordinezNLP/MordinezNLP/dist:/usr/src/app/dist mordineznlp:whl-builder
 
       - name: Move WHL
-        run: mkdir whl_package && cp dist/*.whl whl_package/
+        run: cp dist/*.whl whl_package/
 
       - name: Archive WHL
         uses: actions/upload-artifact@v2
