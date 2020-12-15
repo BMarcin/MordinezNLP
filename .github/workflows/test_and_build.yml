@@ -76,6 +76,9 @@ jobs:
     needs: [Build_WHL]
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: mkdir
         run: mkdir whl_package
 
@@ -84,6 +87,9 @@ jobs:
         with:
           name: MordinezNLP-WHL
           path: whl_package/
+
+      - name: Delete src
+        run: rm -r src
 
       - name: Docker build image
         run: docker build -f docker/run_tests_python_36_WHL.Dockerfile . -t mordineznlp:test-p36-whl
@@ -96,6 +102,9 @@ jobs:
     needs: [ Build_WHL ]
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: mkdir
         run: mkdir whl_package
 
@@ -104,6 +113,9 @@ jobs:
         with:
           name: MordinezNLP-WHL
           path: whl_package/
+
+      - name: Delete src
+        run: rm -r src
 
       - name: Docker build image
         run: docker build -f docker/run_tests_python_37_WHL.Dockerfile . -t mordineznlp:test-p37-whl
@@ -116,6 +128,9 @@ jobs:
     needs: [ Build_WHL ]
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: mkdir
         run: mkdir whl_package
 
@@ -124,6 +139,9 @@ jobs:
         with:
           name: MordinezNLP-WHL
           path: whl_package/
+
+      - name: Delete src
+        run: rm -r src
 
       - name: Docker build image
         run: docker build -f docker/run_tests_python_38_WHL.Dockerfile . -t mordineznlp:test-p38-whl
