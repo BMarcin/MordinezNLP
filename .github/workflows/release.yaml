@@ -48,7 +48,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: MordinezNLP-WHL
-          path: dist/
+          path: whl_package/
 
       - name: Build Docker builder
         run: docker build -f docker/publish_WHL.Dockerfile . -t mordineznlp:whl-publisher
