@@ -1,4 +1,4 @@
-name: Release to test pypi
+name: Release WHL to PyPI
 
 on:
   release:
