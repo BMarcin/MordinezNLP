@@ -2,7 +2,10 @@ name: Release WHL to PyPI
 
 on:
   release:
-    types: [published, created, prereleased]
+    types:
+      - published
+      - created
+      - prereleased
 
 jobs:
   Build_WHL:
