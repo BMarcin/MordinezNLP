@@ -1,7 +1,7 @@
 import unittest
 
 try:
-    from src.MordinezNLP import ngram_iterator
+    from src.MordinezNLP.utils import ngram_iterator
 except:
     from MordinezNLP.utils import ngram_iterator
 
