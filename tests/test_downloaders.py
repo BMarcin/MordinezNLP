@@ -3,8 +3,12 @@ import unittest
 from io import BytesIO
 
 from helper import BASE_DIR
-from src.MordinezNLP.downloaders import BasicDownloader, CommonCrawlDownloader
-from src.MordinezNLP.downloaders.Processors import text_data_processor, gzip_to_text_data_processor
+try:
+    from src.MordinezNLP.downloaders import BasicDownloader, CommonCrawlDownloader
+    from src.MordinezNLP.downloaders.Processors import text_data_processor, gzip_to_text_data_processor
+except:
+    from MordinezNLP.downloaders import BasicDownloader, CommonCrawlDownloader
+    from MordinezNLP.downloaders.Processors import text_data_processor, gzip_to_text_data_processor
 
 
 class ProcessorsTests(unittest.TestCase):

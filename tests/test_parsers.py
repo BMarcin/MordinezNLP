@@ -3,7 +3,10 @@ import unittest
 from io import BytesIO
 
 from helper import BASE_DIR
-from src.MordinezNLP.parsers import process_pdf
+try:
+    from src.MordinezNLP.parsers import process_pdf
+except:
+    from MordinezNLP.parsers import process_pdf
 
 
 class ProcessorsTests(unittest.TestCase):
