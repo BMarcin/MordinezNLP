@@ -3,7 +3,7 @@ import unittest
 try:
     from src.MordinezNLP import ngram_iterator
 except:
-    from src.MordinezNLP.utils import ngram_iterator
+    from MordinezNLP.utils import ngram_iterator
 
 
 class UtilsTests(unittest.TestCase):
