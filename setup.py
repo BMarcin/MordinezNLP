@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 
 def read_requirements():
-    with open("requirements.txt") as f:
+    with open("WHL_requirements.txt") as f:
         return [line.replace("\n", "") for line in f.readlines()]
 
 
