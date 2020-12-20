@@ -1,0 +1,456 @@
+
+ 
+ 
+	 
+	 
+	 
+	 
+	 bash [ edytuj ] 
+	 
+		 Z Wikipedii, wolnej encyklopedii 
+		 
+		 
+
+		 
+		 Przejdź do nawigacji 
+		 Przejdź do wyszukiwania 
+		 
+
+ 
+ 
+ 
+
+
+ 
+ bash 
+ 
+ 
+ 
+ 
+ Interfejs programu
+ 
+ 
+ Autor
+ 
+ Chet Ramey
+ 
+ 
+ Aktualna  wersja stabilna 
+ 
+ 5.0 (7 stycznia 2019)   [±] 
+ 
+ 
+ System operacyjny
+ 
+ GNU 
+ 
+ 
+ Rodzaj
+ 
+ Powłoka systemowa 
+ 
+ 
+ Licencja
+ 
+ GNU GPL 
+ 
+
+ 
+ 
+ 
+
+ 
+ 
+ 
+ Książki w Wikibooks 
+ 
+ 
+
+ 
+ 
+ 
+
+ 
+ 
+ 
+ Multimedia w Wikimedia Commons 
+ 
+ 
+ 
+ Strona internetowa 
+ 
+ 
+ bash  –  powłoka systemowa   UNIX  napisana dla projektu  GNU . Program jest rozprowadzany na licencji  GPL .
+ Bash to jedna z najpopularniejszych  powłok  systemów  uniksowych . Jest domyślną powłoką w większości  dystrybucji  systemu  GNU/Linux  oraz w systemie  macOS  od wersji 10.3 do 10.14 [1] , istnieją także wersje dla większości systemów uniksowych. Bash jest także domyślną powłoką w środowisku  Cygwin  i  MinGW  dla systemów  Win32 .
+ Bash pozwala na pracę w  trybie konwersacyjnym  i w  trybie wsadowym . Język basha umożliwia definiowanie aliasów,  funkcji , zawiera konstrukcje sterujące przepływem (if, while, for, ...). Powłoka systemowa zachowuje historię wykonywanych poleceń i zapisuje ją domyślnie w pliku  .bash_history  w  katalogu domowym  użytkownika.
+ 
+ Spis treści 
+ 
+ 1   Historia 
+ 2   Język powłoki bash 
+ 
+ 2.1   Najciekawsze możliwości 
+ 2.2   Działania na liczbach całkowitych 
+ 2.3   Przekierowanie wejścia/wyjścia 
+ 2.4   Wbudowana obsługa wyrażeń regularnych 
+ 
+ 
+ 3   Zobacz też 
+ 4   Przypisy 
+ 5   Linki zewnętrzne 
+ 
+ 
+
+ Historia [ edytuj  |  edytuj kod ] 
+ Nazwa jest akronimem od Bourne-Again Shell (angielska gra słów: fonetycznie brzmi tak samo, jak  born again shell , czyli odrodzona powłoka). Wywodzi się od  powłoki Bourne’a  sh, która była jedną z pierwszych i najważniejszych powłok systemu UNIX oraz zawiera pomysły zawarte w powłokach  Korna  i  csh . Bash był pisany głównie przez  Briana Foksa  i  Cheta Rameya  w 1987 roku.
+ 
+ Język powłoki bash [ edytuj  |  edytuj kod ] 
+ Najciekawsze możliwości [ edytuj  |  edytuj kod ] 
+ Język powłoki bash jest rozszerzeniem powłoki sh. Większość  skryptów  przeznaczonych dla powłoki sh działa bez zmian w powłoce bash, wyjątkami są skrypty, które odwołują się do wbudowanych zmiennych powłoki Bourne’a lub używają wbudowanych poleceń tej powłoki. Składnia poleceń powłoki bash zawiera idee pochodzące z  powłoki Korna  i  csh  takie jak edycja linii poleceń (ang. command-line editing), historia poleceń, stos katalogów, zmienne $RANDOM i $PPID oraz  POSIX-owe  podstawianie polecenia (składnia: $((...))). Gdy bash jest używany interaktywnie, dostępne jest uzupełnianie nazw plików, poleceń wbudowanych i zewnętrznych programów, zmiennych, itd., co dzieje się po naciśnięciu klawisza TAB.
+ 
+ Działania na liczbach całkowitych [ edytuj  |  edytuj kod ] 
+ Bash, w odróżnieniu od sh, umożliwia wykonanie obliczeń za pomocą wyrażeń w podwójnych nawiasach  ((...))  oraz składni  $[...] . Przykładowo:
+ 
+   #!/bin/bash 
+  x1 = 55               # Przypisz liczbę 55 do zmiennej x1. Uwaga: Nie może być spacji przed i po znaku równości! 
+  (( x1   =  x1 +  1 ))     # Dodaj jeden do x1. Nie stawia się tutaj znaku '$'. 
+  echo   $(( x1  +   1 ))    # Wypisz wartość x1+1 na ekran. 
+  (( ++x1 ))            # Zwiększenie o jeden w stylu języka C. 
+  (( x1++ ))            # Podobnie jak powyżej ale teraz post-inkrementacja. 
+  echo  $ [ x1 = x1*20 ]    # Pomnóż x1 przez 20, zapisz wynik do x1 i wypisz wynik na ekran. 
+  echo   $(( x1  *   20 ))   # To samo co powyżej, ale nie zapisuj wyniku do zmiennej. 
+  echo   $(( x1< 1000 ))   # Sprawdź czy x1 jest mniejsze od 1000. Jeden oznacza prawdę. 
+ 
+ Składnia  ((...))  może być także wykorzystana w wyrażeniach warunkowych, ponieważ w wyniku wykonania zwracane jest 0 lub 1 w zależności od tego czy porównanie wartości zwraca prawdę czy fałsz.
+ 
+   #!/bin/bash 
+  if   (( x   ==  y *  3  + z *  2 )) 
+  then 
+      echo  Yes
+  fi 
+
+  (( z >  23 ))   &&   echo  Yes
+ 
+ Składnia  ((...))  umożliwia posługiwanie się  operatorami :  == ,  != ,  > ,  < ,  >=  i  <= .
+ Bash nie umożliwia wykonywania obliczeń z wykorzystaniem liczb zmiennoprzecinkowych. Jedyne powłoki systemowe pozwalające na posługiwanie się liczbami zmiennoprzecinkowymi to  powłoka Korna  ( 1993 ) oraz  zsh  (od wersji 4.0).
+ 
+ Przekierowanie wejścia/wyjścia [ edytuj  |  edytuj kod ] 
+ Bash rozszerza składnię powłoki sh służącą do przekierowania wejścia/wyjścia. Możliwe jest skierowanie standardowego wyjścia i standardowego wyjścia dla błędów do pliku w sposób krótszy niż w  sh :
+ 
+  polecenie  & > plik
+ 
+ W powłoce Bourne’a wyglądałoby to następująco ' polecenie > plik 2>& '. Od wersji 2.05b możliwe jest przekierowanie zmiennej na standardowe wejście polecenia:
+ 
+   #!/bin/bash 
+ polecenie  <<<   "Napis do przeczytania ze standardowego wejścia" 
+  #można też użyć zmiennej 
+  zmienna = "Ala ma" 
+ cat  <<<   " ${ zmienna }  kota." 
+ 
+ Przykład:  Przekieruj standardowe wyjście do pliku, wypisz dane, zamknij plik, zresetuj wyjście:
+ 
+   exec   6 > & 1                 # niech deskryptor pliku 6 stanie się kopią standardowego wyjścia 
+  exec   1 >test.dane          # otwórz plik test.dane do zapisu, deskryptor nr 1 oznacza, 
+                           # że trafi do niego standardowe wyjście 
+  echo   "dane:dane:dane"      # wypisz coś 
+  exec   1 < & -                 # zamknij plik 
+  exec   1 > & 6                  # przywróć deskryptorowi 1 jego pierwotną funkcję 
+  exec  < & -                 # zamknij deskryptor 6 
+ 
+ Otwórz i zamknij plik:
+ 
+   # otwórz test.dane do czytania 
+  exec   6 <test.dane
+  # czytaj kolejne wiersze i wypisuj je, aż do napotkania końca pliku 
+  while   read  -u  6  dane
+  do 
+     echo   " $dane " 
+  done 
+  # zamknij plik 
+  exec   6 < & -
+ 
+ Podstaw wyjście zewnętrznego polecenia do zmiennej:
+ 
+   # wyszukaj pliki których nazwa kończy się na literę "h" 
+  # i zachowaj wynik w zmiennej ZM 
+  ZM = $( find . -name  "*h" ) 
+ 
+ Wbudowana obsługa wyrażeń regularnych [ edytuj  |  edytuj kod ] 
+ Bash 3.0 posiada wbudowaną obsługę wyrażeń regularnych, dopasowanie odbywa się za pomocą składni przypominającej  Perl :
+ 
+      [[   napis   = ~ wyrażenie  ]] 
+ 
+ Używa się standardowych wyrażeń regularnych opisanych na stronie regex(7) podręcznika  man . Powyższe polecenie zwraca wartość 0, gdy dopasowanie udało się lub 1 w przeciwnym przypadku. Podwyrażenia otoczone nawiasami są dostępne w zmiennej powłoki BASH_REMATCH, tak jak w poniższym przykładzie:
+ 
+   if   [[   abcfoobarbletch   = ~ foo ( bar ) bl ( .* )   ]] 
+  then 
+      echo   "Dopasowanie udało się\!" 
+      echo   $BASH_REMATCH                 # wypisuje: foobarbletch 
+      echo   ${ BASH_REMATCH [1] }            # wypisuje: bar 
+      echo   ${ BASH_REMATCH [2] }            # wypisuje: etch 
+  fi 
+ 
+ Używanie powyższej składni, zamiast programu  grep , daje kod działający szybciej, ponieważ unika się kosztownego tworzenia nowego procesu.
+ 
+ Zobacz też [ edytuj  |  edytuj kod ] 
+ inne powłoki :
+ powłoka Bourne’a 
+ powłoka C (Csh) 
+ powłoka Korna (Ksh) 
+ powłoka Z (Zsh) 
+ potok 
+ Przypisy [ edytuj  |  edytuj kod ] 
+ 
+ ↑   Use zsh as the default shell on your Mac , Apple Support  [dostęp 2019-07-01]     ( ang. ) . 
+ 
+ 
+ Linki zewnętrzne [ edytuj  |  edytuj kod ] 
+ w języku polskim
+ Podręcznik systemowy (strona man) 
+ w języku angielskim
+ Strona domowa basha w projekcie GNU 
+ Podręcznik basha na stronie projektu GNU 
+ Advanced Bash-Scripting Guide 
+ [ pokaż ]   p   •   d   •   e Projekt GNU Historia 
+ Manifest GNU 
+ Free Software Foundation 
+ Historia wolnego oprogramowania 
+ Licencje 
+ GNU General Public License 
+ GNU Lesser General Public License 
+ Affero General Public License 
+ GNU Free Documentation License 
+ Programy 
+ GNU  ( warianty ) 
+ GNU/Linux 
+ GNU/Windows 
+ Hurd 
+ GNOME 
+ Bash 
+ Emacs 
+ GCC 
+ GNU C Library 
+ GNU Coreutils 
+ Autotools (GNU build system) 
+ GNU Debugger 
+ GNU Binutils 
+ GNU Scientific Library 
+ GRUB 
+ Gnash 
+ IceCat 
+ Postacie 
+ Robert J. Chassell 
+ Loïc Dachary 
+ Ricardo Galli 
+ Georg C. F. Greve 
+ Federico Heinz 
+ Benjamin Mako Hill 
+ Bradley M. Kuhn 
+ Eben Moglen 
+ Richard Stallman 
+ John Sullivan 
+ Leonard H. Tower Jr. 
+ 
+ 
+ 
+
+ 
+ 
+ Źródło: „ https://pl.wikipedia.org/w/index.php?title=Bash&oldid=60057973 ” 
+		 Kategorie :  GNU Powłoki systemowe Wolne oprogramowanie napisane w C 
+	 
+ 
+ 
+	 
+ 
+
+ 
+	 Menu nawigacyjne 
+	 
+		 
+ 
+	 
+		 Narzędzia osobiste 
+	 
+	 
+		 Nie jesteś zalogowany Dyskusja Edycje Utwórz konto Zaloguj się 
+
+	 
+ 
+
+		 
+			 
+ 
+	 
+		 Przestrzenie nazw 
+	 
+	 
+		 Artykuł Dyskusja 
+
+	 
+ 
+
+			 
+ 
+	 
+	 
+		 Warianty 
+	 
+	 
+		 
+
+	 
+ 
+
+		 
+		 
+			 
+ 
+	 
+		 Widok 
+	 
+	 
+		 Czytaj Edytuj Edytuj kod źródłowy Historia i autorzy 
+
+	 
+ 
+
+			 
+ 
+	 
+	 
+		 Więcej 
+	 
+	 
+		 
+
+	 
+ 
+
+			 
+	 
+		 Szukaj 
+	 
+	 
+		 
+			 
+			 
+			 
+			 
+		 
+	 
+ 
+
+		 
+	 
+
+ 
+	 
+		 
+	 
+	 
+ 
+	 
+		 Nawigacja 
+	 
+	 
+		 Strona główna Losuj artykuł Kategorie artykułów Najlepsze artykuły Częste pytania (FAQ) 
+
+	 
+ 
+
+	 
+ 
+	 
+		 Dla czytelników 
+	 
+	 
+		 O Wikipedii Zgłoś błąd Zgłoś błąd w pliku Kontakt Wspomóż Wikipedię 
+
+	 
+ 
+ 
+ 
+	 
+		 Dla wikipedystów 
+	 
+	 
+		 Pierwsze kroki Portal wikipedystów Ogłoszenia Zasady Pomoc Ostatnie zmiany 
+
+	 
+ 
+ 
+ 
+	 
+		 Narzędzia 
+	 
+	 
+		 Linkujące Zmiany w linkowanych Prześlij plik Strony specjalne Link do tej wersji Informacje o tej stronie Cytowanie tego artykułu Element Wikidanych Zaproponuj do mediów społecznościowych 
+
+	 
+ 
+ 
+ 
+	 
+		 Drukuj lub eksportuj 
+	 
+	 
+		 Utwórz książkę Pobierz jako PDF Wersja do druku 
+
+	 
+ 
+ 
+ 
+	 
+		 W innych projektach 
+	 
+	 
+		 Wikimedia Commons Wikibooks 
+
+	 
+ 
+
+	 
+ 
+	 
+		 W innych językach 
+	 
+	 
+		 العربية Azərbaycanca বাংলা Български Bosanski Català Čeština Dansk Deutsch Eesti Ελληνικά English Español Esperanto Euskara فارسی Français Galego 한국어 Hrvatski Bahasa Indonesia Íslenska Italiano עברית Magyar മലയാളം Bahasa Melayu Nederlands 日本語 Norsk bokmål Português Română Русский Slovenčina Српски / srpski Srpskohrvatski / српскохрватски Suomi Svenska ไทย Türkçe Українська Tiếng Việt 中文 34 więcej 
+		 Edytuj linki 
+	 
+ 
+
+ 
+
+ 
+ 
+	 
+	  Tę stronę ostatnio edytowano 11 cze 2020, 18:45. 
+	 Tekst udostępniany na  licencji Creative Commons: uznanie autorstwa, na tych samych warunkach , z możliwością obowiązywania dodatkowych ograniczeń.
+Zobacz szczegółowe informacje o  warunkach korzystania . 
+ 
+
+	 
+	 Polityka prywatności 
+	 O Wikipedii 
+	 Korzystasz z Wikipedii tylko na własną odpowiedzialność 
+	 Wersja mobilna 
+	 Dla deweloperów 
+	 Statystyki 
+	 Komunikat na temat ciasteczek 
+ Aktywuj podgląd 
+
+	 
+	 
+	 
+ 
+
+	 
+ 
+
+
+ 
+ 
+ 
+ 

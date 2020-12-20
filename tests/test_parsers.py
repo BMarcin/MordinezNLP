@@ -3,10 +3,11 @@ import unittest
 from io import BytesIO
 
 from helper import BASE_DIR
+
 try:
-    from src.MordinezNLP.parsers import process_pdf
+    from src.MordinezNLP.parsers import process_pdf, HTML_Parser
 except:
-    from MordinezNLP.parsers import process_pdf
+    from MordinezNLP.parsers import process_pdf, HTML_Parser
 
 
 class ProcessorsTests(unittest.TestCase):
@@ -39,6 +40,33 @@ class ProcessorsTests(unittest.TestCase):
             pdf = BytesIO(f.read())
             pdf_out = process_pdf(pdf)
             self.assertEqual(pdf_out, output)
+
+    def test_html_doc_1(self):
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_1_response.txt"), "r") as f:
+            parsed_doc_ground_truth = f.read()
+
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_1.html"), "r") as f:
+            parsed_doc = HTML_Parser(f.read())
+
+        self.assertEqual(parsed_doc_ground_truth, parsed_doc)
+
+    def test_html_doc_2(self):
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_2_response.txt"), "r") as f:
+            parsed_doc_ground_truth = f.read()
+
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_2.html"), "r") as f:
+            parsed_doc = HTML_Parser(f.read())
+
+        self.assertEqual(parsed_doc_ground_truth, parsed_doc)
+
+    def test_html_doc_3(self):
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_3_response.txt"), "r") as f:
+            parsed_doc_ground_truth = f.read()
+
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_3.html"), "r") as f:
+            parsed_doc = HTML_Parser(f.read())
+
+        self.assertEqual(parsed_doc_ground_truth, parsed_doc)
 
 
 if __name__ == '__main__':
