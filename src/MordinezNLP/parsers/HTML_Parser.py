@@ -10,7 +10,7 @@ def HTML_Parser(html_doc: str) -> str:
         html_doc (str): a HTML doc
 
     Returns:
-        String which is a vaulable text parsed from HTML doc.
+        str: String which is a vaulable text parsed from HTML doc.
     """
     tree = HTMLParser(html_doc)
 

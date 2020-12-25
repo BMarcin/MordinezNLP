@@ -51,7 +51,7 @@ class BasicDownloader:
             custom_headers (int): Refer to *download_to_bytes_io* function documentation.
 
         Returns:
-            A list of downloaded and processed by *file_type_handler* function files.
+            list: A list of downloaded and processed by *file_type_handler* function files.
         """
         with Pool(threads) as p:
             downloaded_strings = p.starmap(
@@ -88,7 +88,7 @@ class BasicDownloader:
             url (str): valid HTTP/HTTPS URL
 
         Returns:
-            downloaded file as a string
+            io.BytesIO: downloaded file as a bytes
         """
         # make list from one URL
         url_list = [url]

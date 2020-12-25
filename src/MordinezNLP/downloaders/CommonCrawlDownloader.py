@@ -59,7 +59,7 @@ class CommonCrawlDownloader:
         This is stage 1 of CommonCrawl Downloader. Function gets metadata from CommonCrawl for source GZIP files
 
         Returns:
-            List of dicts. Each dict is a CC metadata.
+            List[dict]: Each dict is a CC metadata.
         """
         # preprocess links to use BasicDownloader
         post_processed_urls = []
@@ -101,7 +101,7 @@ class CommonCrawlDownloader:
             data_in (BytesIO): a downloaded bytes
 
         Returns:
-            Source html of crawled site.
+            str: Source html of crawled site.
         """
         gzipped_data = gzip_to_text_data_processor(data_in)
         return gzipped_data.strip().split("\n\n", 2)[2]

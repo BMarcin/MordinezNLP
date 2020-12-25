@@ -11,7 +11,7 @@ def ngram_iterator(string: str, ngram_len: int = 3) -> list:
         ngram_len (int): lenght of each ngram
 
     Returns:
-        ngram - list of ngram_len characters of input string
+        list: ngram - list of ngram_len characters of input string
     """
     total = len(string) - ngram_len + 1
     if total < 1:

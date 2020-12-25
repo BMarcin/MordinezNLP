@@ -12,7 +12,7 @@ def text_data_processor(data: BytesIO) -> str:
         data (BytesIO): input data which comes from downloader class/function
 
     Returns:
-        string - which is parsed input
+        str: parsed input
     """
     return data.read().decode('utf8').replace("\r", "")
 
@@ -25,7 +25,7 @@ def pdf_data_processor(data: BytesIO) -> str:
         data (BytesIO): input data which comes from downloader class/function
 
     Returns:
-        string - which is parsed input, more informations about parsing PDFs can be found in method
+       str: parsed input, more informations about parsing PDFs can be found in method
         MordinezNLP.parsers.process_pdf
     """
     return "\n".join(process_pdf(data))
@@ -39,7 +39,7 @@ def gzip_to_text_data_processor(data: BytesIO) -> str:
         data (BytesIO): input data which comes from downlaoder class/function
 
     Returns:
-        string - which is parsed input
+        str: parsed input
     """
     unzipped_file = gzip.GzipFile(fileobj=data)
     raw_data = unzipped_file.read()

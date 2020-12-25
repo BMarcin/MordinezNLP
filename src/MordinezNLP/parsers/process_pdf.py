@@ -17,7 +17,7 @@ def process_pdf(pdf_input: BytesIO) -> List[str]:
         pdf_input (BytesIO): A PDF as a BytesIO object
 
     Returns:
-        Parsed text without texts found in tables
+        List[str]: Parsed text without texts found in tables
     """
     doc_output = []
     with pdfplumber.open(pdf_input) as pdf:
