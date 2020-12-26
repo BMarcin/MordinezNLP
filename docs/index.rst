@@ -12,6 +12,7 @@ Welcome to MordinezNLP's documentation!
 
    downloaders_basic
    downloaders_commoncrawl
+   downloaders_elasticsearch
    downloaders_processors
    parsers_pdf
    parsers_html
