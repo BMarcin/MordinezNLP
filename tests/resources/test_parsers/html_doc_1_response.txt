@@ -238,4 +238,4 @@ jump to content my subreddits edit subscriptions popular - all - random - users 
  
  permalink embed save [–] lucidus_somniorum   123 points 124 points 125 points   2 years ago   (15 children) That's hot. 
  
- permalink embed save parent 
+ permalink embed save parent

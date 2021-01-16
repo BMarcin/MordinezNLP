@@ -2,6 +2,7 @@ import gzip
 from io import BytesIO
 
 from ..parsers import process_pdf
+# from src.MordinezNLP.parsers import process_pdf
 
 
 def text_data_processor(data: BytesIO) -> str:

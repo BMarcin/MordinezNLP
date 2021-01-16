@@ -1,5 +1,5 @@
 Downloaders - Elastic Search
-==========================
+=============================
 
 .. automodule:: MordinezNLP.downloaders.ElasticSearchDownloader
    :members:

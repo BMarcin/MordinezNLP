@@ -42,31 +42,38 @@ class ProcessorsTests(unittest.TestCase):
             self.assertEqual(pdf_out, output)
 
     def test_html_doc_1(self):
-        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_1_response.txt"), "r") as f:
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_1_response.txt"), "r", encoding='utf8') as f:
             parsed_doc_ground_truth = f.read()
 
-        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_1.html"), "r") as f:
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_1.html"), "r", encoding='utf8') as f:
             parsed_doc = HTML_Parser(f.read())
 
         self.assertEqual(parsed_doc_ground_truth, parsed_doc)
 
     def test_html_doc_2(self):
-        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_2_response.txt"), "r") as f:
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_2_response.txt"), "r", encoding='utf8') as f:
             parsed_doc_ground_truth = f.read()
 
-        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_2.html"), "r") as f:
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_2.html"), "r", encoding='utf8') as f:
             parsed_doc = HTML_Parser(f.read())
 
         self.assertEqual(parsed_doc_ground_truth, parsed_doc)
 
     def test_html_doc_3(self):
-        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_3_response.txt"), "r") as f:
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_3_response.txt"), "r", encoding='utf8') as f:
             parsed_doc_ground_truth = f.read()
 
-        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_3.html"), "r") as f:
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_parsers", "html_doc_3.html"), "r", encoding='utf8') as f:
             parsed_doc = HTML_Parser(f.read())
 
         self.assertEqual(parsed_doc_ground_truth, parsed_doc)
+
+    # def test_html_doc_4(self):
+    #     fake_html_tag = "<html><body>or la<te 80s, 01.03.4223 11-33-3222 or i don>'t know</body></html>"
+    #
+    #     parsed_html = HTML_Parser(fake_html_tag)
+    #
+    #     self.assertEqual(parsed_html, fake_html_tag)
 
 
 if __name__ == '__main__':

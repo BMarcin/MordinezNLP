@@ -1,11 +1,4 @@
-
- 
- 
-	 
-	 
-	 
-	 
-	 bash [ edytuj ] 
+bash [ edytuj ] 
 	 
 		 Z Wikipedii, wolnej encyklopedii 
 		 
@@ -439,18 +432,4 @@ Zobacz szczegółowe informacje o  warunkach korzystania .
 	 Dla deweloperów 
 	 Statystyki 
 	 Komunikat na temat ciasteczek 
- Aktywuj podgląd 
-
-	 
-	 
-	 
- 
-
-	 
- 
-
-
- 
- 
- 
- 
+ Aktywuj podgląd

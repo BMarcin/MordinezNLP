@@ -16,6 +16,7 @@ Welcome to MordinezNLP's documentation!
    downloaders_processors
    parsers_pdf
    parsers_html
+   processors_basic
    utils
 
 Indices and tables

@@ -1,0 +1,1 @@
+Hi! It is my first doc, let's check how my function can process such text. Today is the <date>. the end.

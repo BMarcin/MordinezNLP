@@ -3,7 +3,7 @@ import time
 from itertools import repeat
 from multiprocessing import Pool
 
-from typing import List, Iterable
+from typing import List, Iterable, Callable
 
 import requests
 
@@ -24,7 +24,7 @@ class BasicDownloader:
     @staticmethod
     def download_urls(
             urls: List[str],
-            file_type_handler,
+            file_type_handler: Callable,
             threads: int = 8,
             sleep_time: int = 0,
             custom_headers: Iterable = repeat({}),
@@ -43,7 +43,7 @@ class BasicDownloader:
 
         Args:
             urls (List[str]): List of URLs of files to download
-            file_type_handler: Function used to convert downloaded file to a specified format
+            file_type_handler (Callable): Function used to convert downloaded file to a specified format
             threads (int): Number of threads to download files
             sleep_time (int): Time used to prevent file downloads from being detected as DDoS attack
             max_retries (int): Refer to *download_to_bytes_io* function documentation.
