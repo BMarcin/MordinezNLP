@@ -4,10 +4,13 @@ bleach==3.2.1
 certifi==2020.6.20
 cffi==1.14.3
 chardet==3.0.4
+clean-text==0.3.0
 colorama==0.4.4
 cryptography==3.1.1
 docutils==0.16
 elasticsearch==7.10.1
+emoji==0.6.0
+ftfy==5.8
 idna==2.10
 imagesize==1.2.0
 jeepney==0.4.3
@@ -19,6 +22,7 @@ pdfminer.six==20200517
 pdfplumber==0.5.24
 Pillow==8.0.1
 pkginfo==1.5.0.1
+pluggy==0.13.1
 pockets==0.9.1
 pycparser==2.20
 pycryptodome==3.9.9
@@ -26,6 +30,7 @@ Pygments==2.7.1
 pyparsing==2.4.7
 pytz==2020.1
 readme-renderer==27.0
+regex==2020.11.13
 requests==2.24.0
 requests-toolbelt==0.9.1
 rfc3986==1.4.0
