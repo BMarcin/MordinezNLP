@@ -7,7 +7,7 @@ on:
 
 jobs:
   Test_python_38:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -20,7 +20,7 @@ jobs:
         run: docker run mordineznlp:test-p38
 
   Test_python_37:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -33,7 +33,7 @@ jobs:
         run: docker run mordineznlp:test-p37
 
   Test_python_36:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -46,7 +46,7 @@ jobs:
         run: docker run mordineznlp:test-p36
 
   Build_WHL:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [Test_python_38, Test_python_37, Test_python_36]
 
     steps:
@@ -72,7 +72,7 @@ jobs:
           path: whl_package/
 
   Test_python_36_WHL:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [Build_WHL]
 
     steps:
@@ -98,7 +98,7 @@ jobs:
         run: docker run mordineznlp:test-p36-whl
 
   Test_python_37_WHL:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [ Build_WHL ]
 
     steps:
@@ -124,7 +124,7 @@ jobs:
         run: docker run mordineznlp:test-p37-whl
 
   Test_python_38_WHL:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [ Build_WHL ]
 
     steps:
