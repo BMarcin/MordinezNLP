@@ -17,6 +17,7 @@ Welcome to MordinezNLP's documentation!
    parsers_pdf
    parsers_html
    processors_basic
+   tokenizers_spacy
    utils
 
 Indices and tables

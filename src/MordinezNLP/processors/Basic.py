@@ -699,11 +699,7 @@ if __name__ == '__main__':
 
     bp = BasicProcessor()
 
-    with open(os.path.join(BASE_DIR, "tests", "resources", "test_processors", "doc5.txt"), encoding="utf8") as f:
+    with open(os.path.join(BASE_DIR, "tests", "resources", "test_processors", "doc1.txt"), encoding="utf8") as f:
         f_content = f.read()
-        post_process = bp.process(f_content, language='en',
-                                  no_multiple_chars=False,
-                                  replace_with_date="<here-is-date>",
-                                  replace_with_bracket="<here-is-bracket>",
-                                  )
+        post_process = bp.process(f_content, language='en')
         print(post_process)
