@@ -3,8 +3,10 @@ import unittest
 import spacy
 from spacy.language import Language
 
-from src.MordinezNLP.tokenizers import spacy_tokenizer
-
+try:
+    from src.MordinezNLP.tokenizers import spacy_tokenizer
+except:
+    from MordinezNLP.tokenizers import spacy_tokenizer
 
 class TestTokenizers(unittest.TestCase):
     nlp: Language = spacy.load("en_core_web_sm")
