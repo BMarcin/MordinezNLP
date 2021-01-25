@@ -81,10 +81,10 @@ class TestProcessors(unittest.TestCase):
             "123123 And the last one is 3rd place"
         ]
         texts_gt = [
-            "Hi! it is my first text written on ⦅date⦆",
-            "And here is my e-mail: ⦅email⦆",
+            "Hi! it is my first text written on <date>",
+            "And here is my e-mail: <email>",
             "Its a joke ofc",
-            "⦅number⦆ And the last one is ⦅number⦆ place"
+            "<number> And the last one is <number> place"
         ]
 
         processed_texts = self.bp.process(
