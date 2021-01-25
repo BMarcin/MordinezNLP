@@ -5,8 +5,10 @@ from glob import glob
 from helper import BASE_DIR
 try:
     from src.MordinezNLP.processors import BasicProcessor
+    from src.MordinezNLP.utils import build_special_token
 except:
     from MordinezNLP.processors import BasicProcessor
+    from MordinezNLP.utils import build_special_token
 
 
 class TestProcessors(unittest.TestCase):
@@ -67,8 +69,8 @@ class TestProcessors(unittest.TestCase):
             f1_content,
             language='en',
             no_multiple_chars=False,
-            replace_with_date="<here-is-date>",
-            replace_with_bracket="<here-is-bracket>",
+            replace_with_date=build_special_token("here-is-date"),
+            replace_with_bracket=build_special_token("here-is-bracket"),
         )
 
         self.assertEqual(content_processed, f1_gt_content)
@@ -81,10 +83,10 @@ class TestProcessors(unittest.TestCase):
             "123123 And the last one is 3rd place"
         ]
         texts_gt = [
-            "Hi! it is my first text written on <date>",
-            "And here is my e-mail: <email>",
+            "Hi! it is my first text written on ⦅date⦆",
+            "And here is my e-mail: ⦅email⦆",
             "Its a joke ofc",
-            "<number> And the last one is <number> place"
+            "⦅number⦆ And the last one is ⦅number⦆ place"
         ]
 
         processed_texts = self.bp.process(

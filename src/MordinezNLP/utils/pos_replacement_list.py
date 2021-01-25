@@ -1,0 +1,21 @@
+pos_replacement_list = {
+    "SYM": "X",
+    "PUNCT": "PUNCT",
+    "X": "X",
+    "ADJ": "ADJ",
+    "CCONJ": "CONJ",
+    "CONJ": "CONJ",
+    "SCONJ": "CONJ",
+    "NUM": "NOUN",
+    "DET": "DET",
+    "PRON": "NOUN",
+    "ADP": "ADP",
+    "VERB": "VERB",
+    "PROPN": "NOUN",
+    "NOUN": "NOUN",
+    "PART": "X",
+    "ADV": "ADV",
+    "SPACE": "X",
+    "INTJ": "X",
+    "AUX": "AUX"
+}

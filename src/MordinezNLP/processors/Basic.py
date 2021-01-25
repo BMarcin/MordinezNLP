@@ -42,7 +42,7 @@ class BasicProcessor:
         self.fix_brackets_in_words = re.compile(r"\s+(([^\s^<^>])+)(<|>)+(([^\s^<^>])+)\s+")
 
         # limit to a specified set of characters
-        self.limit_regex = re.compile(r"(([^a-zA-Z0-9,\.<> !?äöüÄÖÜßùàûâüæÿçéèêëïîôœ@\-:'])|([^\s]{30,}))",
+        self.limit_regex = re.compile(r"(([^a-zA-Z0-9,\.<> !?äöüÄÖÜßùàûâüæÿçéèêëïîôœ@\-:()\[\]'])|([^\s]{30,}))",
                                       re.IGNORECASE)
 
         # replace more than 2 spaces to a single one
@@ -86,8 +86,11 @@ class BasicProcessor:
         self.multiple_characters_non_sense = re.compile(
             r"(<number>|<date>|<unknown>|<url>|<email>|<more>|<less>)|[,\.<>!?]", re.IGNORECASE)
 
-        # final regex wich removes double dots and newline (from HTML_Parser)
+        # final regex which removes double dots and newline (from HTML_Parser)
         self.double_dots = re.compile(r"\.\.\n")
+
+        # remove hyphenated
+        self.hyphenated_regex = re.compile(r"\s+([^\-<>\s]+)-([^\-<>\s]+)\s+")
 
         # ==== DATES SECTION ====
         # common dates - a common dates formats used in multiple languages
@@ -365,6 +368,7 @@ class BasicProcessor:
             no_dates: bool = True,
             no_multiple_chars: bool = True,
             no_lists: bool = True,
+            no_brackets: bool = True,
             replace_with_url: str = "<url>",
             replace_with_email: str = "<email>",
             replace_with_phone_number: str = "<phone>",
@@ -497,6 +501,7 @@ class BasicProcessor:
             no_math (bool): remove >= <= in math strings
             no_dates (bool):  remove dates strings in input text 'early 80s' -> '<date>'
             no_lists (bool): replace all texts lists
+            no_brackets (bool): replace brackets: '[', ']', '(', ')'
             no_multiple_chars (bool): reduce multiple characters in string into a single ones 'supeeeeeer' -> 'super'
             replace_with_url (str): a special token used to replace urls
             replace_with_email (str): a special token used to replace emails
@@ -590,9 +595,17 @@ class BasicProcessor:
             ),
             lambda x: re.sub(self.space_regex, " ", x),
             lambda x: re.sub(self.double_upper_case_letters, r" \1 \2 ", x),
-            lambda x: re.sub(self.none_regex, r" {replace_with_bracket} \4 \6 {replace_with_bracket} ".format(
-                replace_with_bracket=replace_with_bracket), x),
         ]
+
+        if no_brackets:
+            rules += [
+                lambda x: re.sub(self.none_regex, r" {replace_with_bracket} \4 \6 {replace_with_bracket} ".format(
+                    replace_with_bracket=replace_with_bracket), x),
+            ]
+        else:
+            rules += [
+                lambda x: re.sub(self.none_regex, r" \1 ", x),
+            ]
 
         # if there will be occurences where multiple characters were not reoved, uncomment this section
         # in such case there will be doubled removal of a multiplied characters
@@ -628,7 +641,8 @@ class BasicProcessor:
             lambda x: x.replace(" < ", " "),
             lambda x: re.sub(self.space_regex, " ", x),
             lambda x: re.sub(self.multi_tag_regex, r"\3\5\7\9\11\13\15", x),
-            lambda x: re.sub(self.url_fix_regex, r"\1. \2", x)
+            lambda x: re.sub(self.url_fix_regex, r"\1. \2", x),
+            lambda x: re.sub(self.hyphenated_regex, r" \1\2 ", x)
         ]
 
         rules = pre_rules + rules + post_rules
@@ -636,6 +650,8 @@ class BasicProcessor:
         if type(text_to_process) is str:
             for i, rule in enumerate(rules):
                 text_to_process = rule(text_to_process)
+                # print(i, "\n", text_to_process)
+                # print("==========================================================\n\n\n\n")
             return text_to_process
         else:
             processed_texts = []
@@ -699,7 +715,7 @@ if __name__ == '__main__':
 
     bp = BasicProcessor()
 
-    with open(os.path.join(BASE_DIR, "tests", "resources", "test_processors", "doc1.txt"), encoding="utf8") as f:
+    with open(os.path.join(BASE_DIR, "tests", "resources", "test_processors", "doc2.txt"), encoding="utf8") as f:
         f_content = f.read()
         post_process = bp.process(f_content, language='en')
         print(post_process)

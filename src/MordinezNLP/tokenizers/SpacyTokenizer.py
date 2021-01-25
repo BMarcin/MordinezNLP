@@ -1,5 +1,6 @@
 import spacy
 from spacy import util
+from spacy.lang.char_classes import LIST_ELLIPSES, LIST_ICONS, ALPHA_LOWER, ALPHA_UPPER, CONCAT_QUOTES, ALPHA
 from spacy.lang.tokenizer_exceptions import TOKEN_MATCH
 from spacy.language import Language
 from spacy.tokenizer import Tokenizer
@@ -29,7 +30,21 @@ def spacy_tokenizer(nlp: Language) -> Tokenizer:
     suffixes.remove(">")
     suffixes = tuple(suffixes)
 
-    infixes = nlp.Defaults.infixes
+    # code from https://spacy.io/usage/linguistic-features#native-tokenizers
+    infixes = (
+        LIST_ELLIPSES
+        + LIST_ICONS
+        + [
+            r"(?<=[0-9])[+\-\*^](?=[0-9-])",
+            r"(?<=[{al}{q}])\.(?=[{au}{q}])".format(
+                al=ALPHA_LOWER, au=ALPHA_UPPER, q=CONCAT_QUOTES
+            ),
+            r"(?<=[{a}]),(?=[{a}])".format(a=ALPHA),
+            # EDIT: commented out regex that splits on hyphens between letters:
+            #r"(?<=[{a}])(?:{h})(?=[{a}])".format(a=ALPHA, h=HYPHENS),
+            r"(?<=[{a}0-9])[:<>=/](?=[{a}])".format(a=ALPHA),
+        ]
+    )
     rules = nlp.Defaults.tokenizer_exceptions
 
     token_match = TOKEN_MATCH

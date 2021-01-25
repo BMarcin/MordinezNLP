@@ -3,6 +3,11 @@ from typing import List, Iterable, Callable, Any
 
 from elasticsearch import Elasticsearch
 
+try:
+    from src.MordinezNLP.parsers import HTML_Parser
+except:
+    from ..parsers import HTML_Parser
+
 
 class ElasticSearchDownloader:
     """
@@ -154,24 +159,50 @@ class ElasticSearchDownloader:
 
 if __name__ == '__main__':
     es = ElasticSearchDownloader(
-        ip='',
+        ip='51.210.123.137',
         port=9200,
         timeout=10
     )
 
-    body = {}  # <- use your own elastic search query
+    # print(es.get_all_available_indexes())
+    for index in es.get_all_available_indexes():
+        if 'ep' in index or 'ukp' in index:
+            print(index)
+
+    body = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match": {
+                                "language_version_info.en.keyword": "original"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
 
     ' Your own processing function for a single element '
     def processing_func(data: dict) -> str:
-        return data['my_key']['my_next_key'].replace("\r\n", "\n")
+        if 'en' in data['_source']:
+            if 'content' in data['_source']['en']:
+                content = " ".join(part['content'] for part in data['_source']['en']['content'])
+                parsed = HTML_Parser(content, separator='... \n')
+                print(parsed)
+                return parsed
+        return ""
 
 
     ' Scroll the data '
     downloaded_elastic_search_data = es.scroll_data(
-        'my_index_name',
+        'ukp_commons_debates',
         body,
         processing_func,
-        threads=8
+        threads=8,
+        scroll_size=300
     )
 
     print(len(downloaded_elastic_search_data))
+
+    print(downloaded_elastic_search_data[:3])
