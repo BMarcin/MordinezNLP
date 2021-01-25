@@ -3,6 +3,11 @@
 
 ***REMOVED***
 
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+
 
 ***REMOVED***
 ***REMOVED***
@@ -154,24 +159,50 @@
 
 ***REMOVED***
 ***REMOVED***
-        ip='',
+***REMOVED***
 ***REMOVED***
 ***REMOVED***
 ***REMOVED***
 
-***REMOVED***}  # <- use your own elastic search query
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
 
 ***REMOVED***
 ***REMOVED***
-        return data['my_key']['my_next_key'].replace("\r\n", "\n")
+***REMOVED***
+***REMOVED***
+        ***REMOVED***
+***REMOVED***
+***REMOVED***
+            ***REMOVED***
+        ***REMOVED***
+            ***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
 
 
 ***REMOVED***
 ***REMOVED***
-        'my_index_name',
 ***REMOVED***
 ***REMOVED***
-        threads=8
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+
 ***REMOVED***
 
 ***REMOVED***
