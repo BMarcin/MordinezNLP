@@ -15,7 +15,7 @@ if __name__ == '__main__':
     nlp: Language = spacy.load('en_core_web_sm')
     nlp.tokenizer = spacy_tokenizer(nlp)
 
-    doc = nlp(f1_gt_content)
+    doc = nlp("And here is my email: <email>")
 
     tokens = [[str(token) for token in sentence] for sentence in doc.sents]
     pprint(tokens)

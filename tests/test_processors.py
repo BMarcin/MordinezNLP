@@ -82,7 +82,7 @@ class TestProcessors(unittest.TestCase):
         ]
         texts_gt = [
             "Hi! it is my first text written on <date>",
-            "And here is my e-mail: <email>",
+            "And here is my email: <email>",
             "Its a joke ofc",
             "<number> And the last one is <number> place"
         ]
