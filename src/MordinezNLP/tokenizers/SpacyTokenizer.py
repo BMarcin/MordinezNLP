@@ -19,8 +19,12 @@ def spacy_tokenizer(nlp: Language) -> Tokenizer:
     Returns:
         spacy.tokenizer.Tokenizer: A SpaCy tokenizer
     """
-    prefixes = nlp.Defaults.prefixes + ('^<i>', )
-    suffixes = nlp.Defaults.suffixes + ('</i>$', )
+    if type(nlp.Defaults.prefixes) is list:
+        prefixes = nlp.Defaults.prefixes + ['^<i>']
+        suffixes = nlp.Defaults.suffixes + ['</i>$']
+    else:
+        prefixes = nlp.Defaults.prefixes + ('^<i>', )
+        suffixes = nlp.Defaults.suffixes + ('</i>$', )
 
     prefixes = list(prefixes)
     prefixes.remove("<")
