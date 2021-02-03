@@ -3,7 +3,7 @@ import sys
 
 # pre initialize ENV
 import stanza
-stanza.download('en')
+# stanza.download('en')
 
 if __name__ == '__main__':
     loader = unittest.TestLoader()

@@ -56,6 +56,8 @@ class PartOfSpeech:
         in a list is a document (SpaCy logic in pipelines). In such case You can specify if You want to
         return texts in structure documents[sentences[tokens]] or sentences[tokens] (removing the documents layer).
 
+        # todo better describe pos and token replacement lists
+
         Args:
             texts (List[str]): an input texts, each item in a list is a document (SpaCy logic in pipelines)
             threads (int): How many threads You want to use in SpaCy tokenization
@@ -77,7 +79,7 @@ class PartOfSpeech:
         function_token_replacement_list = self.token_replacement_list if token_replacement_list is None else token_replacement_list
 
         # tokenize
-        pipe = self.spacy_nlp.pipe(texts, disable=['ner', 'tagger', 'textcat'], n_threads=threads,
+        pipe = self.spacy_nlp.pipe(texts, disable=['ner', 'tagger', 'textcat', 'entity_linker', 'entity_ruler', 'lemmatizer', 'morphologizer', 'attribute_ruler', 'tok2vec'], n_process=threads,
                                    batch_size=batch_size)
         for doc_num, doc in enumerate(tqdm(pipe, desc='Tokenizing', total=len(texts))):
             sent_begin_index = len(sentences)
@@ -93,8 +95,9 @@ class PartOfSpeech:
         for sentence in tqdm(stanza_pipe.sentences, desc='POS tagging'):
             sentence_pos = []
             for token in sentence.words:
-                if token in function_token_replacement_list.keys():
-                    sentence_pos.append(function_token_replacement_list[str(token)])
+                if str(token.text) in function_token_replacement_list.keys():
+                    # print('tag replacement', token, function_token_replacement_list[token.text])
+                    sentence_pos.append(function_token_replacement_list[token.text])
                 else:
                     sentence_pos.append(function_pos_replacement_list[token.upos])
             poss.append(sentence_pos)
@@ -123,7 +126,7 @@ if __name__ == '__main__':
 
     pos_output = pos_tagger.process(
         [
-            f1_gt_content,
+            '<date> Opposition day ( <number> allotted day )',
         ],
         4,
         30,
@@ -133,14 +136,14 @@ if __name__ == '__main__':
     for out in pos_output:
         print(out[0], out[1])
 
-    pos_output = pos_tagger.process(
-        [
-            f1_gt_content,
-        ],
-        4,
-        30,
-        return_docs=True
-    )
-
-    for out in pos_output:
-        print(out[0], out[1])
+    # pos_output = pos_tagger.process(
+    #     [
+    #         f1_gt_content,
+    #     ],
+    #     4,
+    #     30,
+    #     return_docs=True
+    # )
+    #
+    # for out in pos_output:
+    #     print(out[0], out[1])
