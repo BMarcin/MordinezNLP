@@ -65,7 +65,7 @@ class BasicProcessor:
             re.IGNORECASE)
         # replace special token occurences one by one with colons
         self.multi_tag_colon_regex = re.compile(
-            r"(((<date>[:]*){2,})|((<unk>[:]*){2,})|((<number>[:]*){2,})|((<url>[:]*){2,})|((<email>[:]*){2,})|((<less>[:]*){2,})|((<more>[:]*){2,})|((<bracket>[:]*){2,}))")
+            r"(((<date>[:]*){2,})|((<unk>[:]*){2,})|((<number>[:]*){2,})|((<url>[:]*){2,})|((<email>[:]*){2,})|((<less>[:]*){2,})|((<more>[:]*){2,})|((<bracket>[:]*){2,}))", re.IGNORECASE)
 
         # remove starting space
         self.starting_space_regex = re.compile(r"^(\s)+", re.IGNORECASE)
@@ -654,8 +654,8 @@ class BasicProcessor:
         if type(text_to_process) is str:
             for i, rule in enumerate(rules):
                 text_to_process = rule(text_to_process)
-                # print(i, "\n", text_to_process)
-                # print("==========================================================\n\n\n\n")
+                print(i, "\n", text_to_process)
+                print("==========================================================\n\n\n\n")
             return text_to_process
         else:
             processed_texts = []
