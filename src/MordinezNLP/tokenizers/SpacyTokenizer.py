@@ -1,7 +1,6 @@
 import spacy
 from spacy import util
 from spacy.lang.char_classes import LIST_ELLIPSES, LIST_ICONS, ALPHA_LOWER, ALPHA_UPPER, CONCAT_QUOTES, ALPHA
-from spacy.lang.tokenizer_exceptions import TOKEN_MATCH
 from spacy.language import Language
 from spacy.tokenizer import Tokenizer
 
@@ -51,7 +50,7 @@ def spacy_tokenizer(nlp: Language) -> Tokenizer:
     )
     rules = nlp.Defaults.tokenizer_exceptions
 
-    token_match = TOKEN_MATCH
+    token_match = None
 
     prefix_search = util.compile_prefix_regex(prefixes).search
     suffix_search = util.compile_suffix_regex(suffixes).search
