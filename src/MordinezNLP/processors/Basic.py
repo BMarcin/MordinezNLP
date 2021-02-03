@@ -63,6 +63,9 @@ class BasicProcessor:
         self.multi_tag_regex = re.compile(
             r"(((<date>[\s,]*){2,})|((<unk>[\s,]*){2,})|((<number>[\s,]*){2,})|((<url>[\s,]*){2,})|((<email>[\s,]*){2,})|((<less>[\s,]*){2,})|((<more>[\s,]*){2,})|((<bracket>[\s,]*){2,}))",
             re.IGNORECASE)
+        # replace special token occurences one by one with colons
+        self.multi_tag_colon_regex = re.compile(
+            r"(((<date>[:]*){2,})|((<unk>[:]*){2,})|((<number>[:]*){2,})|((<url>[:]*){2,})|((<email>[:]*){2,})|((<less>[:]*){2,})|((<more>[:]*){2,})|((<bracket>[:]*){2,}))")
 
         # remove starting space
         self.starting_space_regex = re.compile(r"^(\s)+", re.IGNORECASE)
@@ -642,7 +645,8 @@ class BasicProcessor:
             lambda x: re.sub(self.space_regex, " ", x),
             lambda x: re.sub(self.multi_tag_regex, r"\3\5\7\9\11\13\15", x),
             lambda x: re.sub(self.url_fix_regex, r"\1. \2", x),
-            lambda x: re.sub(self.hyphenated_regex, r" \1\2 ", x)
+            lambda x: re.sub(self.hyphenated_regex, r" \1\2 ", x),
+            lambda x: re.sub(self.multi_tag_colon_regex, r"\3\5\7\9\11\13\15 : \3\5\7\9\11\13\15", x)
         ]
 
         rules = pre_rules + rules + post_rules
@@ -717,5 +721,5 @@ if __name__ == '__main__':
 
     with open(os.path.join(BASE_DIR, "tests", "resources", "test_processors", "doc2.txt"), encoding="utf8") as f:
         f_content = f.read()
-        post_process = bp.process(f_content, language='en')
+        post_process = bp.process('Punkt wir haben extra um <number>:<number> Uhr noch ein Event', language='en')
         print(post_process)
