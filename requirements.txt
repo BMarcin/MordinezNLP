@@ -13,7 +13,7 @@ cymem==2.0.5
 docutils==0.16
 elasticsearch==7.10.1
 emoji==0.6.0
-en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.1/en_core_web_sm-3.0.1.tar.gz
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz
 ftfy==5.8
 idna==2.10
 imagesize==1.2.0
