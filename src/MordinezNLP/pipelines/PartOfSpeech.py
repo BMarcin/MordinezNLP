@@ -23,6 +23,7 @@ class PartOfSpeech:
         """
         Initializer of spacy and stanza models.
 
+        Remember to download Stanza model with ```stanza.download('en')```
         Args:
             nlp (Language): a SpaCy Language object -> You have to load spacy model on Your own
             language (str): a language code from stanza -> see https://stanfordnlp.github.io/stanza/available_models.html
