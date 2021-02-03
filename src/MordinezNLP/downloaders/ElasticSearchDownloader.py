@@ -159,29 +159,14 @@ class ElasticSearchDownloader:
 
 if __name__ == '__main__':
     es = ElasticSearchDownloader(
-        ip='51.210.123.137',
+        ip='',
         port=9200,
         timeout=10
     )
 
-    # print(es.get_all_available_indexes())
-    for index in es.get_all_available_indexes():
-        if 'ep' in index or 'ukp' in index:
-            print(index)
+    print(es.get_all_available_indexes())
 
-    body = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match": {
-                                "language_version_info.en.keyword": "original"
-                            }
-                        }
-                    ]
-                }
-            }
-        }
+    body = {}
 
     ' Your own processing function for a single element '
     def processing_func(data: dict) -> str:
@@ -196,7 +181,7 @@ if __name__ == '__main__':
 
     ' Scroll the data '
     downloaded_elastic_search_data = es.scroll_data(
-        'ukp_commons_debates',
+        '',
         body,
         processing_func,
         threads=8,
