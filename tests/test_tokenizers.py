@@ -34,6 +34,28 @@ class TestTokenizers(unittest.TestCase):
             ]
         )
 
+        def test_spacy_tokenizer_case2(self):
+            tokenized_data = self.nlp('Punkt wir haben extra um <number> : <number> Uhr noch ein Event')
+            self.assertEqual(
+                [str(token) for token in tokenized_data],
+                [
+                    "Punkt",
+                    "wir",
+                    "haben",
+                    "extra",
+                    "um",
+                    "<number>",
+                    ":",
+                    "<number>",
+                    "be",
+                    "<number>",
+                    "Uhr",
+                    "noch",
+                    "ein",
+                    "Event"
+                ]
+            )
+
 
 if __name__ == '__main__':
     unittest.main()

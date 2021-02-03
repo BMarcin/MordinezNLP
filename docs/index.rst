@@ -18,6 +18,7 @@ Welcome to MordinezNLP's documentation!
    parsers_html
    processors_basic
    tokenizers_spacy
+   pipelines_pos
    utils
    downloaders_processors
    parsers_pdf

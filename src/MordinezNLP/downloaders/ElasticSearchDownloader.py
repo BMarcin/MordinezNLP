@@ -12,6 +12,7 @@ except:
 class ElasticSearchDownloader:
     """
     Class used to download elastic search data from specified index using multithreading
+    todo make tests
     """
 
     def __init__(self, ip: str, port: int, timeout: int = 100):

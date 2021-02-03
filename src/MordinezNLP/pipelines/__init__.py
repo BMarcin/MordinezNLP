@@ -1,0 +1,1 @@
+from .PartOfSpeech import PartOfSpeech

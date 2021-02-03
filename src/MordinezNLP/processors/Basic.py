@@ -50,7 +50,7 @@ class BasicProcessor:
         # split each word which has two uppercase letters ReCure -> Re Cure
         self.double_upper_case_letters = re.compile(r"([A-Z][^\s^A-Z^\-^.^,^?^!]+)([A-Z][^\s^A-Z^\-^.^,^?^!]+)")
         # escape eveything what is in brackets
-        self.none_regex = re.compile(r"(\s*((\(([^\)]+)\))|(\[([^\]]+)\]))\s*)", re.IGNORECASE)
+        self.none_regex = re.compile(r"(\s*(((\()([^\)]+)(\)))|((\[)([^\]]+)(\])))\s*)", re.IGNORECASE)
 
         # place space before and after all digits
         self.no_space_digits_regex = re.compile(r"(\d+)(th|st|nd|rd)*")
@@ -602,12 +602,12 @@ class BasicProcessor:
 
         if no_brackets:
             rules += [
-                lambda x: re.sub(self.none_regex, r" {replace_with_bracket} \4 \6 {replace_with_bracket} ".format(
+                lambda x: re.sub(self.none_regex, r" {replace_with_bracket} \5 \9 {replace_with_bracket} ".format(
                     replace_with_bracket=replace_with_bracket), x),
             ]
         else:
             rules += [
-                lambda x: re.sub(self.none_regex, r" \1 ", x),
+                lambda x: re.sub(self.none_regex, r" \4\8 \5\9 \6\10 ", x),
             ]
 
         # if there will be occurences where multiple characters were not reoved, uncomment this section
@@ -654,8 +654,8 @@ class BasicProcessor:
         if type(text_to_process) is str:
             for i, rule in enumerate(rules):
                 text_to_process = rule(text_to_process)
-                print(i, "\n", text_to_process)
-                print("==========================================================\n\n\n\n")
+                # print(i, "\n", text_to_process)
+                # print("==========================================================\n\n\n\n")
             return text_to_process
         else:
             processed_texts = []
@@ -721,5 +721,5 @@ if __name__ == '__main__':
 
     with open(os.path.join(BASE_DIR, "tests", "resources", "test_processors", "doc2.txt"), encoding="utf8") as f:
         f_content = f.read()
-        post_process = bp.process('Punkt wir haben extra um <number>:<number> Uhr noch ein Event', language='en')
+        post_process = bp.process(f_content, language='en', no_brackets=False)
         print(post_process)

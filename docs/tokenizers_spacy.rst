@@ -9,6 +9,7 @@ Example usage:
 .. code:: python
 
         from MordinezNLP.tokenizers import spacy_tokenizer
+        import spacy
 
         nlp: Language = spacy.load("en_core_web_sm")
         nlp.tokenizer = spacy_tokenizer(nlp)
