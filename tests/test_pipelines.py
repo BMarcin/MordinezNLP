@@ -1,6 +1,7 @@
 import json
 import os
 import unittest
+from pprint import pprint
 
 import spacy
 from spacy.language import Language
@@ -14,23 +15,25 @@ except:
     from MordinezNLP.pipelines import PartOfSpeech
     from MordinezNLP.tokenizers import spacy_tokenizer
 
+
 class TestPipelines(unittest.TestCase):
     nlp: Language = spacy.load("en_core_web_sm")
     nlp.tokenizer = spacy_tokenizer(nlp)
+
+    pos_tagger = PartOfSpeech(
+        nlp,
+        'en'
+    )
 
     def test_pos_pipeline_case1(self):
         with open(os.path.join(BASE_DIR, "tests", "resources", "test_pipelines", "pos_1.txt"), encoding="utf8") as f:
             to_process_content = f.read()
 
-        with open(os.path.join(BASE_DIR, "tests", "resources", "test_pipelines", "pos_1_gt.json"), encoding="utf8") as f2:
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_pipelines", "pos_1_gt.json"),
+                  encoding="utf8") as f2:
             gt = json.loads(f2.read())
 
-        pos_tagger = PartOfSpeech(
-            self.nlp,
-            'en'
-        )
-
-        pos_output = pos_tagger.process(
+        pos_output = self.pos_tagger.process(
             [to_process_content],
             4,
             30,
@@ -41,16 +44,22 @@ class TestPipelines(unittest.TestCase):
         for sentence, sentence_pos in pos_output:
             outputs.append([sentence, sentence_pos])
 
-        pos_output = pos_tagger.process(
+        self.assertEqual(outputs, gt['sentences'])
+
+    def test_pos_pipeline_case2(self):
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_pipelines", "pos_1.txt"), encoding="utf8") as f:
+            to_process_content = f.read()
+
+        with open(os.path.join(BASE_DIR, "tests", "resources", "test_pipelines", "pos_1_gt.json"),
+                  encoding="utf8") as f2:
+            gt = json.loads(f2.read())
+
+        pos_output = self.pos_tagger.process(
             [to_process_content],
             4,
             30,
             return_docs=True
         )
-
-        docs = []
-        for doc in pos_output:
-            docs.append(doc)
 
         gt_sentences = []
         gt_poss = []
@@ -58,7 +67,10 @@ class TestPipelines(unittest.TestCase):
             gt_sentences.append(sentence)
             gt_poss.append(sentence_pos)
 
-        self.assertEqual([outputs, docs], [gt['sentences'], [(gt_sentences, gt_poss)]])
+        docs = []
+        for doc in pos_output:
+            docs.append(doc)
+        self.assertEqual(docs, [(gt_sentences, gt_poss)])
 
 
 if __name__ == '__main__':

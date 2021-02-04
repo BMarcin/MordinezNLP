@@ -38,6 +38,19 @@ class PartOfSpeech:
         self.pos_replacement_list = pos_replacement_list
         self.token_replacement_list = token_replacement_list
 
+        modules_to_disable = [
+            # 'tok2vec',
+            # 'parser',
+            'ner',
+            'attribute_ruler',
+            'lemmatizer',
+        ]
+
+        for module in modules_to_disable:
+            self.spacy_nlp.disable_pipe(module)
+        #
+        # self.spacy_nlp.add_pipe('senter')
+
     def process(
             self,
             texts: List[str],
@@ -79,8 +92,11 @@ class PartOfSpeech:
         function_token_replacement_list = self.token_replacement_list if token_replacement_list is None else token_replacement_list
 
         # tokenize
-        pipe = self.spacy_nlp.pipe(texts, disable=['ner', 'tagger', 'textcat', 'entity_linker', 'entity_ruler', 'lemmatizer', 'morphologizer', 'attribute_ruler', 'tok2vec'], n_process=threads,
-                                   batch_size=batch_size)
+        pipe = self.spacy_nlp.pipe(
+            texts,
+            n_process=threads,
+            batch_size=batch_size
+        )
         for doc_num, doc in enumerate(tqdm(pipe, desc='Tokenizing', total=len(texts))):
             sent_begin_index = len(sentences)
             for sent_num, sent in enumerate(doc.sents):
@@ -126,7 +142,7 @@ if __name__ == '__main__':
 
     pos_output = pos_tagger.process(
         [
-            '<date> Opposition day ( <number> allotted day )',
+            f1_gt_content,
         ],
         4,
         30,
