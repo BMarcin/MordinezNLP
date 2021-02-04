@@ -4,7 +4,8 @@ elasticsearch>=7.10.1
 pdfplumber>=0.5.25
 requests>=2.25.1
 selectolax>=0.2.10
-spacy>=3.0.1
-stanza>=1.1.1
+spacy==3.0.1
+spacy-legacy==3.0.1
+stanza==1.1.1
 torch>=1.7.1
 tqdm>=4.50.2
