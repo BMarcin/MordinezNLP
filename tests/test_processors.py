@@ -1,6 +1,5 @@
 import os
 import unittest
-from glob import glob
 
 from helper import BASE_DIR
 try:
