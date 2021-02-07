@@ -1,0 +1,40 @@
+{
+  "sentences": [
+    [
+      ["<date>", "Opposition", "day", "(", "<number>", "allotted", "day", ")"],
+      ["NOUN", "NOUN", "NOUN", "PUNCT", "NOUN", "VERB", "NOUN", "PUNCT"]
+    ],
+    [
+      ["There", "will", "be", "a", "debate", "on", "a", "motion", "relating", "to", "fire", "and", "rehire", "tactics", "followed", "by", ",", "a", "debate", "relating", "to", "social", "care", "."],
+      ["NOUN", "AUX", "VERB", "DET", "NOUN", "ADP", "DET", "NOUN", "VERB", "ADP", "NOUN", "CONJ", "NOUN", "NOUN", "VERB", "ADP", "PUNCT", "DET", "NOUN", "VERB", "ADP", "ADJ", "NOUN", "PUNCT"]
+    ],
+    [
+      ["Both", "debates", "will", "arise", "on", "a", "motion", "in", "the", "name", "of", "the", "official", "Opposition", "."],
+      ["DET", "NOUN", "AUX", "VERB", "ADP", "DET", "NOUN", "ADP", "DET", "NOUN", "ADP", "DET", "ADJ", "NOUN", "PUNCT"]
+    ],
+    [
+      ["<date>", "General", "debate", "on", "covid-<number>", "."],
+      ["NOUN", "ADJ", "NOUN", "ADP", "NOUN", "PUNCT"]
+    ],
+    [
+      ["<date>", "Private", "Members", "Bills", "."],
+      ["NOUN", "ADJ", "NOUN", "NOUN", "PUNCT"]
+    ],
+    [
+      ["At", "the", "conclusion", "of", "business", ",", "the", "House", "will", "rise", "for", "recess", "and", "return", "on", "<date>", "."],
+      ["ADP", "DET", "NOUN", "ADP", "NOUN", "PUNCT", "DET", "NOUN", "AUX", "VERB", "ADP", "NOUN", "CONJ", "VERB", "ADP", "NOUN", "PUNCT"]
+    ],
+    [
+      ["The", "provisional", "business", "for", "the", "week", "commencing", "<date>", "will", "include", ":", "<date>", "General", "debate", "on", "covid-<number>", "."],
+      ["DET", "ADJ", "NOUN", "ADP", "DET", "NOUN", "VERB", "NOUN", "AUX", "VERB", "PUNCT", "NOUN", "ADJ", "NOUN", "ADP", "NOUN", "PUNCT"]
+    ],
+    [
+      ["I", "am", "not", "going", "to", "preempt", "the", "statement", "from", "my", "right", "hon", "."],
+      ["NOUN", "AUX", "X", "VERB", "X", "VERB", "DET", "NOUN", "ADP", "NOUN", "ADJ", "NOUN", "PUNCT"]
+    ],
+    [
+      ["Friend", "the", "Secretary", "of", "State", "for", "Health", "and", "Social", "Care", ",", "but", "if", "there", "were", "to", "be", "any", "subsequent", "implications", "for", "next", "week", "'s", "business", "I", "will", "of", "course", "update", "the", "House", "in", "due", "course", "."],
+      ["NOUN", "DET", "NOUN", "ADP", "NOUN", "ADP", "NOUN", "CONJ", "NOUN", "NOUN", "PUNCT", "CONJ", "CONJ", "NOUN", "VERB", "X", "VERB", "DET", "ADJ", "NOUN", "ADP", "ADJ", "NOUN", "X", "NOUN", "NOUN", "AUX", "ADV", "ADV", "VERB", "DET", "NOUN", "ADP", "ADJ", "ADV", "PUNCT"]
+    ]
+  ]
+}

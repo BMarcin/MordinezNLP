@@ -1,0 +1,4 @@
+This is my multiline file.
+
+It contains special characters like: ąęźżćłó;@!#G:SDFGMN"};l.;,`13/-+
+and also german: äöüß

@@ -1,0 +1,150 @@
+name: Test and build WHL
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  Test_python_38:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: docker build -f docker/run_tests_python_38.Dockerfile . -t mordineznlp:test-p38
+
+      - name: Test code
+        run: docker run mordineznlp:test-p38
+
+  Test_python_37:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Docker build image
+        run: docker build -f docker/run_tests_python_37.Dockerfile . -t mordineznlp:test-p37
+
+      - name: Test code
+        run: docker run mordineznlp:test-p37
+
+  Test_python_36:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Docker build image
+        run: docker build -f docker/run_tests_python_36.Dockerfile . -t mordineznlp:test-p36
+
+      - name: Test code
+        run: docker run mordineznlp:test-p36
+
+  Build_WHL:
+    runs-on: ubuntu-latest
+    needs: [Test_python_38, Test_python_37, Test_python_36]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: mkdir whl_package
+        run: mkdir whl_package
+
+      - name: Build Docker builder
+        run: docker build -f docker/build_WHL.Dockerfile . -t mordineznlp:whl-builder
+
+      - name: Build WHL
+        run: docker run -e PACKAGEVERSION=${GITHUB_REF##*/} -v /home/runner/work/MordinezNLP/MordinezNLP/dist:/usr/src/app/dist mordineznlp:whl-builder
+
+      - name: Move WHL
+        run: cp dist/*.whl whl_package/
+
+      - name: Archive WHL
+        uses: actions/upload-artifact@v2
+        with:
+          name: MordinezNLP-WHL
+          path: whl_package/
+
+  Test_python_36_WHL:
+    runs-on: ubuntu-latest
+    needs: [Build_WHL]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: mkdir
+        run: mkdir whl_package
+
+      - name: Download WHL artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: MordinezNLP-WHL
+          path: whl_package/
+
+      - name: Delete src
+        run: rm -r src
+
+      - name: Docker build image
+        run: docker build -f docker/run_tests_python_36_WHL.Dockerfile . -t mordineznlp:test-p36-whl
+
+      - name: Test code
+        run: docker run mordineznlp:test-p36-whl
+
+  Test_python_37_WHL:
+    runs-on: ubuntu-latest
+    needs: [ Build_WHL ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: mkdir
+        run: mkdir whl_package
+
+      - name: Download WHL artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: MordinezNLP-WHL
+          path: whl_package/
+
+      - name: Delete src
+        run: rm -r src
+
+      - name: Docker build image
+        run: docker build -f docker/run_tests_python_37_WHL.Dockerfile . -t mordineznlp:test-p37-whl
+
+      - name: Test code
+        run: docker run mordineznlp:test-p37-whl
+
+  Test_python_38_WHL:
+    runs-on: ubuntu-latest
+    needs: [ Build_WHL ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: mkdir
+        run: mkdir whl_package
+
+      - name: Download WHL artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: MordinezNLP-WHL
+          path: whl_package/
+
+      - name: Delete src
+        run: rm -r src
+
+      - name: Docker build image
+        run: docker build -f docker/run_tests_python_38_WHL.Dockerfile . -t mordineznlp:test-p38-whl
+
+      - name: Test code
+        run: docker run mordineznlp:test-p38-whl

@@ -1,0 +1,26 @@
+Here we can teeeeeeeeeeeeeeeeeest how function will leave multiple characters in a word.
+
+And also we can add some cool links:
+> https://github.com/BMarcin/MordinezNLP/projects/3,
+> https://theblue.ai/en/
+> https://pytorch.org/
+This doc also tests a replacements with custom tokens, so I need to write some of them:
+- For example a date: early 90s or sixteenth of january 2020
+- Another example will be text (in brackets)
+
+And list with only one item:
+- my item
+
+Here is a random looooong list:
+- item 1
+- item 2
+- item 3
+- item 4
+- item 5
+
+And last one list with only tokens to replace:
+- 12
+- 43
+-5
+> 23
+>333334
