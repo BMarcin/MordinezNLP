@@ -30,6 +30,7 @@ MordinezNLP is build on top of the SpaCy and Stanza.
 
 <h3 align="center">Quick tour</h3>
 Text cleaning and POS tagging
+
 ```python
 from MordinezNLP.processors import BasicProcessor
 from MordinezNLP.pipelines import PartOfSpeech
@@ -55,6 +56,7 @@ pos_output = pos_tagger.process(
 ```
 
 CommonCrawl downloader
+
 ```python
 from MordinezNLP.downloaders import CommonCrawlDownloader
 
@@ -68,6 +70,7 @@ ccd.download('./test_data')
 ```
 
 PDF parser
+
 ```python
 from io import BytesIO
 from MordinezNLP.parsers import process_pdf
@@ -84,6 +87,7 @@ Installation
 </h3>
 
 <h4>With pip</h4>
+
 ```bash
 pip install MordinezNLP
 ```
