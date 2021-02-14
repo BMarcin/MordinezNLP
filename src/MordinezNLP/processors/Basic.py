@@ -2,6 +2,7 @@ import re
 from typing import List, Callable, Union
 
 from cleantext import clean
+from tqdm import tqdm
 
 
 class BasicProcessor:
@@ -659,7 +660,7 @@ class BasicProcessor:
             return text_to_process
         else:
             processed_texts = []
-            for text in text_to_process:
+            for text in tqdm(text_to_process, desc="Processing text list"):
                 for i, rule in enumerate(rules):
                     text = rule(text)
                     # print(text, "\n\n")
