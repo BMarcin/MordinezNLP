@@ -3,7 +3,7 @@ name: Test and build WHL
 on:
   push:
     branches:
-      - '*'
+      - '**'
 
 jobs:
   Test_python_38:
