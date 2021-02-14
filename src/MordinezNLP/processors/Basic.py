@@ -662,7 +662,10 @@ class BasicProcessor:
             for text in text_to_process:
                 for i, rule in enumerate(rules):
                     text = rule(text)
+                    # print(text, "\n\n")
                 processed_texts.append(text)
+                # if text_num % 1000 == 0:
+                # print(text_num)
             return processed_texts
 
     def process_multiple_characters(self, text_to_process: str) -> str:
@@ -688,9 +691,12 @@ class BasicProcessor:
         for entity in re.findall(self.multiple_characters_regex, text_to_process):
             match = ""
             if match not in ['.']:
+                # secure entity if it is a regex character
+                entity = '\\'+entity
                 for match in re.findall("(([^" + entity + "^\s.]*)([" + entity + "]{3,})([^" + entity + "^\s.]*))",
                                         text_to_process):
                     text_replaced = re.sub(self.multiple_characters_non_sense, "", match[0])
+
                     if text_replaced == match[2]:
                         text_to_process = text_to_process.replace(match[0], "")
                     else:
@@ -719,7 +725,9 @@ if __name__ == '__main__':
 
     bp = BasicProcessor()
 
-    with open(os.path.join(BASE_DIR, "tests", "resources", "test_processors", "doc2.txt"), encoding="utf8") as f:
-        f_content = f.read()
-        post_process = bp.process(f_content, language='en', no_brackets=False)
-        print(post_process)
+    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_bpe_roberta_base_train_mordineznlp_sm2.txt"), encoding="utf8") as f:
+        # f_content = f.read()
+        # post_process = bp.process(f_content, language='en', no_brackets=False)
+        # print(post_process)
+
+        post_process = bp.process(f.readlines(), language='en', no_brackets=False)
