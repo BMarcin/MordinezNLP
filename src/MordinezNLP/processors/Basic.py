@@ -692,8 +692,9 @@ class BasicProcessor:
             match = ""
             if match not in ['.']:
                 # secure entity if it is a regex character
-                entity = '\\'+entity
-                for match in re.findall("(([^" + entity + "^\s.]*)([" + entity + "]{3,})([^" + entity + "^\s.]*))",
+                entity_to_find = re.escape(entity)
+
+                for match in re.findall("(([^" + entity_to_find + "^\s.]*)([" + entity_to_find + "]{3,})([^" + entity_to_find + "^\s.]*))",
                                         text_to_process):
                     text_replaced = re.sub(self.multiple_characters_non_sense, "", match[0])
 
@@ -702,7 +703,6 @@ class BasicProcessor:
                     else:
                         text_to_process = text_to_process.replace(match[1] + match[2] + match[3],
                                                                   match[1] + entity + match[3])
-
         return text_to_process
 
     def get_special_tokens(self) -> List[str]:

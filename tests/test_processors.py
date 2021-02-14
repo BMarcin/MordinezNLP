@@ -78,14 +78,16 @@ class TestProcessors(unittest.TestCase):
             "And here is my e-mail: asdfe@sdff.pl",
             "Its a joke ofc",
             "123123 And the last one is 3rd place",
-            "Punkt wir haben extra um 05:30 Uhr noch ein Event"
+            "Punkt wir haben extra um 05:30 Uhr noch ein Event",
+            "GAME FOR SALEIF U AINT GOT THOSE CDS^^^^^^^^^^^^ U better slap"
         ]
         texts_gt = [
             "Hi! it is my first text written on <date>",
             "And here is my email: <email>",
             "Its a joke ofc",
             "<number> And the last one is <number> place",
-            "Punkt wir haben extra um <number> : <number> Uhr noch ein Event"
+            "Punkt wir haben extra um <number> : <number> Uhr noch ein Event",
+            "GAME FOR SALEIF U AINT GOT THOSE CDS U better slap"
         ]
 
         processed_texts = self.bp.process(
