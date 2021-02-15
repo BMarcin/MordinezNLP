@@ -535,6 +535,10 @@ class BasicProcessor:
             replace_less
         ]
 
+        # delete default token, because it can occure in text
+        if replace_with_digit == "0":
+            self.used_special_tokens.remove("0")
+
         rules = [
             lambda x: re.sub(self.base_brackets_regex, r"\1 ", x),
             lambda x: re.sub(self.double_dots, ".\n", x),
