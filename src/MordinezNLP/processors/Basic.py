@@ -1,4 +1,7 @@
 import re
+from concurrent.futures.thread import ThreadPoolExecutor
+from itertools import repeat
+from multiprocessing import Pool
 from typing import List, Callable, Union
 
 from cleantext import clean
@@ -66,7 +69,8 @@ class BasicProcessor:
             re.IGNORECASE)
         # replace special token occurences one by one with colons
         self.multi_tag_colon_regex = re.compile(
-            r"(((<date>[:]*){2,})|((<unk>[:]*){2,})|((<number>[:]*){2,})|((<url>[:]*){2,})|((<email>[:]*){2,})|((<less>[:]*){2,})|((<more>[:]*){2,})|((<bracket>[:]*){2,}))", re.IGNORECASE)
+            r"(((<date>[:]*){2,})|((<unk>[:]*){2,})|((<number>[:]*){2,})|((<url>[:]*){2,})|((<email>[:]*){2,})|((<less>[:]*){2,})|((<more>[:]*){2,})|((<bracket>[:]*){2,}))",
+            re.IGNORECASE)
 
         # remove starting space
         self.starting_space_regex = re.compile(r"^(\s)+", re.IGNORECASE)
@@ -653,21 +657,41 @@ class BasicProcessor:
         rules = pre_rules + rules + post_rules
 
         if type(text_to_process) is str:
-            for i, rule in enumerate(rules):
-                text_to_process = rule(text_to_process)
-                # print(i, "\n", text_to_process)
-                # print("==========================================================\n\n\n\n")
-            return text_to_process
+            return BasicProcessor.__process_entity(text_to_process, rules)
         else:
-            processed_texts = []
-            for text in tqdm(text_to_process, desc="Processing text list"):
-                for i, rule in enumerate(rules):
-                    text = rule(text)
-                    # print(text, "\n\n")
-                processed_texts.append(text)
-                # if text_num % 1000 == 0:
-                # print(text_num)
-            return processed_texts
+            with ThreadPoolExecutor(8) as ex:
+                post_processed_list = tqdm(ex.map(
+                    BasicProcessor.__process_entity,
+                    text_to_process,
+                    repeat(rules)
+                ), desc="Processing text list", total=len(text_to_process))
+                return list(post_processed_list)
+            # processed_texts = []
+            # for text in tqdm(text_to_process, desc="Processing text list"):
+            #     for i, rule in enumerate(rules):
+            #         text = rule(text)
+            #         # print(text, "\n\n")
+            #     processed_texts.append(text)
+            #     # if text_num % 1000 == 0:
+            #     # print(text_num)
+            # return processed_texts
+
+    @staticmethod
+    def __process_entity(entity: str, rules: List[Callable]):
+        """
+        A multiprocessing wrapper for *process* func. Process function builds rules list and then uses this function
+        to process entity (if input is a string) or to process list elements if input of *process* is a list of string.
+
+        Args:
+            entity (str): a single entity to process
+            rules (List[Callable]): list of lambda rules
+
+        Returns:
+            str: Processed entity
+        """
+        for rule in rules:
+            entity = rule(entity)
+        return entity
 
     def process_multiple_characters(self, text_to_process: str) -> str:
         """
@@ -695,8 +719,9 @@ class BasicProcessor:
                 # secure entity if it is a regex character
                 entity_to_find = re.escape(entity)
 
-                for match in re.findall("(([^" + entity_to_find + "^\s.]*)([" + entity_to_find + "]{3,})([^" + entity_to_find + "^\s.]*))",
-                                        text_to_process):
+                for match in re.findall(
+                        "(([^" + entity_to_find + "^\s.]*)([" + entity_to_find + "]{3,})([^" + entity_to_find + "^\s.]*))",
+                        text_to_process):
                     text_replaced = re.sub(self.multiple_characters_non_sense, "", match[0])
 
                     if text_replaced == match[2]:
@@ -726,9 +751,21 @@ if __name__ == '__main__':
 
     bp = BasicProcessor()
 
-    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_bpe_roberta_base_train_mordineznlp_sm2.txt"), encoding="utf8") as f:
+    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_bpe_roberta_base_train_mordineznlp_sm2.txt"),
+              encoding="utf8") as f:
         # f_content = f.read()
         # post_process = bp.process(f_content, language='en', no_brackets=False)
         # print(post_process)
 
-        post_process = bp.process(f.readlines(), language='en', no_brackets=False)
+        texts_to_process = [
+            "Hi! it is my first text written on saturday 16th january 2021",
+            "And here is my e-mail: asdfe@sdff.pl",
+            "Its a joke ofc",
+            "123123 And the last one is 3rd place",
+            "Punkt wir haben extra um 05:30 Uhr noch ein Event",
+            "GAME FOR SALEIF U AINT GOT THOSE CDS^^^^^^^^^^^^ U better slap"
+        ]
+
+        post_process = bp.process(texts_to_process, language='en', no_brackets=False)
+
+        print(post_process)
