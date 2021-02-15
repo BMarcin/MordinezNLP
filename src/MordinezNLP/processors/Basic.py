@@ -751,21 +751,8 @@ if __name__ == '__main__':
 
     bp = BasicProcessor()
 
-    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_bpe_roberta_base_train_mordineznlp_sm2.txt"),
+    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_bpe_roberta_base_train_mordineznlp_sm.txt"),
               encoding="utf8") as f:
         # f_content = f.read()
-        # post_process = bp.process(f_content, language='en', no_brackets=False)
+        post_process = bp.process(f.readlines(), language='en', no_brackets=False)
         # print(post_process)
-
-        texts_to_process = [
-            "Hi! it is my first text written on saturday 16th january 2021",
-            "And here is my e-mail: asdfe@sdff.pl",
-            "Its a joke ofc",
-            "123123 And the last one is 3rd place",
-            "Punkt wir haben extra um 05:30 Uhr noch ein Event",
-            "GAME FOR SALEIF U AINT GOT THOSE CDS^^^^^^^^^^^^ U better slap"
-        ]
-
-        post_process = bp.process(texts_to_process, language='en', no_brackets=False)
-
-        print(post_process)
