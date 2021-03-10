@@ -42,7 +42,11 @@ class TestPipelines(unittest.TestCase):
 
         outputs = []
         for sentence, sentence_pos in pos_output:
-            outputs.append([sentence, sentence_pos])
+            # print(sentences, sentences_pos)
+            outputs.append([[token.text for token in sentence] , sentence_pos])
+            # break
+
+        # pprint(outputs)
 
         self.assertEqual(outputs, gt['sentences'])
 
@@ -58,7 +62,8 @@ class TestPipelines(unittest.TestCase):
             [to_process_content],
             4,
             30,
-            return_docs=True
+            return_docs=True,
+            return_string_tokens=True
         )
 
         gt_sentences = []

@@ -1,11 +1,22 @@
+import itertools
 import re
 from concurrent.futures.thread import ThreadPoolExecutor
 from itertools import repeat
 from multiprocessing import Pool
 from typing import List, Callable, Union
 
+import spacy
 from cleantext import clean
 from tqdm import tqdm
+
+try:
+    from src.MordinezNLP.pipelines import PartOfSpeech
+    from src.MordinezNLP.tokenizers import spacy_tokenizer
+    from src.MordinezNLP.utils import pos_replacement_list
+except:
+    from MordinezNLP.tokenizers import spacy_tokenizer
+    from MordinezNLP.pipelines import PartOfSpeech
+    from MordinezNLP.utils import pos_replacement_list
 
 
 class BasicProcessor:
@@ -20,6 +31,30 @@ class BasicProcessor:
         Args:
             language (str): a language shortcut in which we want to clean the input text
         """
+        self.language = language
+
+        # check language
+        if language not in ['en', 'de']:
+            raise Exception('Cant\'t load language specified data')
+
+        # load SpaCy
+        if language == 'en':
+            self.nlp = spacy.load("en_core_web_sm")
+        if language == 'de':
+            self.nlp = spacy.load("de_core_news_sm")
+
+        # get tokenizer
+        self.nlp.tokenizer = spacy_tokenizer(self.nlp)
+
+        # pos tagger
+        self.pos_tagger = PartOfSpeech(
+            self.nlp,
+            self.language
+        )
+
+        # create pos replacement list from basic list
+        self._pos_replacement_list_ = pos_replacement_list
+        self._pos_replacement_list_['NUM'] = 'NUM'
 
         # ==== BASE PROCESSING RULES SECTION ====
         # remove everything what is in a html tags
@@ -59,10 +94,9 @@ class BasicProcessor:
         # place space before and after all digits
         self.no_space_digits_regex = re.compile(r"(\d+)(th|st|nd|rd)*")
 
-        # match texts " ." and replace it to "."
-        self.dot_regex = re.compile(r"\s+\.")
-        # match texts " ," and replace it to ","
-        self.com_regex = re.compile(r"\s+,")
+        # match space before punct
+        self.space_and_punct = re.compile(r"(\s+)([?!.,:])")
+
         # replace all custom tags where one exists after one to a single one, from <date> <date>    <date> -> <date>
         self.multi_tag_regex = re.compile(
             r"(((<date>[\s,]*){2,})|((<unk>[\s,]*){2,})|((<number>[\s,]*){2,})|((<url>[\s,]*){2,})|((<email>[\s,]*){2,})|((<less>[\s,]*){2,})|((<more>[\s,]*){2,})|((<bracket>[\s,]*){2,}))",
@@ -386,7 +420,8 @@ class BasicProcessor:
             replace_with_date: str = "<date>",
             replace_with_bracket: str = "<bracket>",
             replace_more: str = "<more>",
-            replace_less: str = "<less>"
+            replace_less: str = "<less>",
+            use_pos_tagging: bool = True
     ) -> Union[str, List[str]]:
         """
         Main text processing function. It mainly uses regexes to find specified patterns in texts and replace them by
@@ -444,7 +479,7 @@ class BasicProcessor:
 
         **Multiple characters in single words**
 
-        Table below show string *before* and *after* using a *multiple characters in signle word* processing function
+        Table below show string *before* and *after* using a *multiple characters in single word* processing function
 
         ======================  ===================
         Before                  After
@@ -455,7 +490,7 @@ class BasicProcessor:
         'suppppprrrrrpper'      'suprpper'
         ======================  ===================
 
-        Processing multiple characters is extremly usefull in processing CommonCrawl reddit data.
+        Processing multiple characters is extremely useful in processing CommonCrawl reddit data.
 
         **Lists replacement**
 
@@ -464,7 +499,7 @@ class BasicProcessor:
 
         ::
 
-            Mylist:
+            My_list:
             - item 1
             - item 2,
             -item 3
@@ -473,7 +508,7 @@ class BasicProcessor:
 
         ::
 
-            Mylist: item 1, item 2, item 3.
+            My_list: item 1, item 2, item 3.
 
         Use *no_lists* argument to enable this feature.
 
@@ -521,6 +556,7 @@ class BasicProcessor:
             replace_with_bracket (str): a special token used to replace brackets
             replace_more (str): a special token used to replace more '>' and more or equal '>=' symbols in math texts
             replace_less (str): a special token used to replace less '<' and less or equal '<=' symbols in math texts
+            use_pos_tagging (bool): if True function will use StanzaNLP & SpaCy for POS tagging and token normalization
 
         Returns:
             Union[str, List[str]]: Post-processed text
@@ -631,11 +667,14 @@ class BasicProcessor:
 
         rules += [
             lambda x: re.sub(self.limit_regex, " ", x),
-            lambda x: re.sub(self.dot_regex, ".", x),
-            lambda x: re.sub(self.com_regex, ",", x),
+            lambda x: re.sub(self.space_and_punct, r"\2 ", x),
+            # lambda x: print(x),
+            # lambda x: re.sub(self.space_and_punct, r"\1 ", x),
+            # lambda x: re.sub(self.com_regex, ",", x),
+            # lambda x: print(x),
             lambda x: re.sub(self.multi_tag_regex, r"\3\5\7\9\11\13\15", x),
             lambda x: re.sub(self.starting_space_regex, "", x),
-            lambda x: re.sub(self.ending_space_regex, "", x),
+            lambda x: re.sub(self.ending_space_regex, "", x)
         ]
 
         if no_urls or no_emails:
@@ -650,22 +689,39 @@ class BasicProcessor:
             lambda x: re.sub(self.space_regex, " ", x),
             lambda x: re.sub(self.multi_tag_regex, r"\3\5\7\9\11\13\15", x),
             lambda x: re.sub(self.url_fix_regex, r"\1. \2", x),
-            lambda x: re.sub(self.hyphenated_regex, r" \1\2 ", x),
-            lambda x: re.sub(self.multi_tag_colon_regex, r"\3\5\7\9\11\13\15 : \3\5\7\9\11\13\15", x)
+            # lambda x: re.sub(self.hyphenated_regex, r" \1\2 ", x),
+            lambda x: x.replace("-", " "),
+            lambda x: re.sub(self.space_regex, " ", x),
+            lambda x: re.sub(self.multi_tag_colon_regex, r"\3\5\7\9\11\13\15 : \3\5\7\9\11\13\15", x),
+            lambda x: x.replace("e mail", "email")
         ]
 
         rules = pre_rules + rules + post_rules
 
         if type(text_to_process) is str:
-            return BasicProcessor.__process_entity(text_to_process, rules)
+            processed_texts = BasicProcessor.__process_entity(text_to_process, rules)
+            if use_pos_tagging:
+                processed_texts = self.pos_tag_data([processed_texts], replace_with_number)
+                processed_texts = re.sub(self.multi_tag_regex, r"\3\5\7\9\11\13\15", processed_texts[0])
+            return processed_texts
         else:
+            chunks = BasicProcessor.chunk_list(text_to_process, 8)
             with ThreadPoolExecutor(8) as ex:
                 post_processed_list = tqdm(ex.map(
                     BasicProcessor.__process_entity,
-                    text_to_process,
+                    chunks,
                     repeat(rules)
                 ), desc="Processing text list", total=len(text_to_process))
-                return list(post_processed_list)
+
+            processed_texts = list(itertools.chain(*post_processed_list))
+
+            if use_pos_tagging:
+                processed_texts = self.pos_tag_data(processed_texts, replace_with_number)
+
+                for i, item in enumerate(processed_texts):
+                    processed_texts[i] = re.sub(self.multi_tag_regex, r"\3\5\7\9\11\13\15", item)
+            return processed_texts
+
             # processed_texts = []
             # for text in tqdm(text_to_process, desc="Processing text list"):
             #     for i, rule in enumerate(rules):
@@ -676,22 +732,79 @@ class BasicProcessor:
             #     # print(text_num)
             # return processed_texts
 
+    def pos_tag_data(self, post_processed_data: List[str], replace_with_number: str) -> List[str]:
+        """
+        A helper function to postprocess numbers tags and replace according tokens with special token. It also uses SpaCy
+        tokenization to return "normal" form of tokens.
+
+        Long story short: This function will parse input "There wasn't six apples" to "There was not <number> apples".
+
+        Args:
+            post_processed_data (List(str)): a postprocessed texts list
+            replace_with_number (str): a special token to replace numbers with
+
+        Returns:
+            str: postprocessed texts
+        """
+        pos_output = self.pos_tagger.process(
+            post_processed_data,
+            4,
+            30,
+            return_docs=True,
+            pos_replacement_list=self._pos_replacement_list_
+        )
+
+        outputs = []
+
+        for doc in pos_output:
+            post_doc = []
+            for sentence, sentence_pos in zip(doc[0], doc[1]):
+                for i, (token, pos) in enumerate(zip(sentence, sentence_pos)):
+                    if pos == 'NUM':
+                        post_doc.append(replace_with_number + " ")
+                    else:
+                        if token.text == "n't":
+                            if i == 0:
+                                post_doc.append(token.text_with_ws)
+                            else:
+                                if i + 1 == len(sentence) - 1:
+                                    post_doc.append(" " + token.norm_)
+                                else:
+                                    post_doc.append(" " + token.norm_ + " ")
+                        else:
+                            post_doc.append(token.text_with_ws)
+            outputs.append("".join(post_doc))
+
+        return outputs
+
     @staticmethod
-    def __process_entity(entity: str, rules: List[Callable]):
+    def chunk_list(input_list: List[str], size: int) -> List[List[str]]:
+        return [input_list[i::size] for i in range(size)]
+
+    @staticmethod
+    def __process_entity(entity: Union[str, List[str]], rules: List[Callable]) -> Union[str, List[str]]:
         """
         A multiprocessing wrapper for *process* func. Process function builds rules list and then uses this function
         to process entity (if input is a string) or to process list elements if input of *process* is a list of string.
 
         Args:
-            entity (str): a single entity to process
+            entity (Union[str, List[str]]): a single entity to process
             rules (List[Callable]): list of lambda rules
 
         Returns:
-            str: Processed entity
+            Union[str, List[str]]: Processed entity
         """
-        for rule in rules:
-            entity = rule(entity)
-        return entity
+        if type(entity) is str:
+            for rule in rules:
+                entity = rule(entity)
+            return entity
+        else:
+            processed = []
+            for text in entity:
+                for rule in rules:
+                    text = rule(text)
+                processed.append(text)
+            return processed
 
     def process_multiple_characters(self, text_to_process: str) -> str:
         """
@@ -746,26 +859,20 @@ class BasicProcessor:
 
 
 if __name__ == '__main__':
-    import os
-    from helper import BASE_DIR
-
     bp = BasicProcessor()
 
-    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_bpe_roberta_base_train_mordineznlp_sm2.txt"),
-              encoding="utf8") as f:
-        # f_content = f.read()
-        # post_process = bp.process(f_content, language='en', no_brackets=False)
-        # print(post_process)
+    texts_to_process = [
+        "Hi! it is my first text written on saturday 16th january 2021",
+        "And here is my e-mail: asdfe@sdff.pl",
+        "Its a joke ofc",
+        "123123 And the last one is 3rd place",
+        "Punkt wir haben extra um 05:30 Uhr noch ein Event",
+        "GAME FOR SALEIF U AINT GOT THOSE CDS^^^^^^^^^^^^ U better slap"
+    ]
 
-        texts_to_process = [
-            "Hi! it is my first text written on saturday 16th january 2021",
-            "And here is my e-mail: asdfe@sdff.pl",
-            "Its a joke ofc",
-            "123123 And the last one is 3rd place",
-            "Punkt wir haben extra um 05:30 Uhr noch ein Event",
-            "GAME FOR SALEIF U AINT GOT THOSE CDS^^^^^^^^^^^^ U better slap"
-        ]
+    post_process = bp.process(
+        texts_to_process,
+        language='en'
+    )
 
-        post_process = bp.process(texts_to_process, language='en', no_brackets=False)
-
-        print(post_process)
+    print(post_process)

@@ -22,8 +22,8 @@ def spacy_tokenizer(nlp: Language) -> Tokenizer:
         prefixes = nlp.Defaults.prefixes + ['^<i>']
         suffixes = nlp.Defaults.suffixes + ['</i>$']
     else:
-        prefixes = nlp.Defaults.prefixes + ('^<i>', )
-        suffixes = nlp.Defaults.suffixes + ('</i>$', )
+        prefixes = nlp.Defaults.prefixes + ('^<i>',)
+        suffixes = nlp.Defaults.suffixes + ('</i>$',)
 
     prefixes = list(prefixes)
     prefixes.remove("<")
@@ -35,18 +35,18 @@ def spacy_tokenizer(nlp: Language) -> Tokenizer:
 
     # code from https://spacy.io/usage/linguistic-features#native-tokenizers
     infixes = (
-        LIST_ELLIPSES
-        + LIST_ICONS
-        + [
-            r"(?<=[0-9])[+\-\*^](?=[0-9-])",
-            r"(?<=[{al}{q}])\.(?=[{au}{q}])".format(
-                al=ALPHA_LOWER, au=ALPHA_UPPER, q=CONCAT_QUOTES
-            ),
-            r"(?<=[{a}]),(?=[{a}])".format(a=ALPHA),
-            # EDIT: commented out regex that splits on hyphens between letters:
-            #r"(?<=[{a}])(?:{h})(?=[{a}])".format(a=ALPHA, h=HYPHENS),
-            r"(?<=[{a}0-9])[:<>=/](?=[{a}])".format(a=ALPHA),
-        ]
+            LIST_ELLIPSES
+            + LIST_ICONS
+            + [
+                r"(?<=[0-9])[+\-\*^](?=[0-9-])",
+                r"(?<=[{al}{q}])\.(?=[{au}{q}])".format(
+                    al=ALPHA_LOWER, au=ALPHA_UPPER, q=CONCAT_QUOTES
+                ),
+                r"(?<=[{a}]),(?=[{a}])".format(a=ALPHA),
+                # EDIT: commented out regex that splits on hyphens between letters:
+                # r"(?<=[{a}])(?:{h})(?=[{a}])".format(a=ALPHA, h=HYPHENS),
+                r"(?<=[{a}0-9])[:<>=/](?=[{a}])".format(a=ALPHA),
+            ]
     )
     rules = nlp.Defaults.tokenizer_exceptions
 
@@ -71,7 +71,8 @@ if __name__ == '__main__':
 
     nlp.tokenizer = spacy_tokenizer(nlp)
 
-    test_doc = nlp('Hello today is <date>, tomorrow it will be <number> degrees of celcius.')
+    test_doc = nlp(
+        'Hello today is <date>, tomorrow it will be <number> degrees of celcius. Remember, to don\'t touch the glass.')
 
     for token in test_doc:
-        print(token)
+        print(token.norm_)
