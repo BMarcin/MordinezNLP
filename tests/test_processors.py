@@ -66,8 +66,8 @@ class TestProcessors(unittest.TestCase):
             f1_content,
             language='en',
             no_multiple_chars=False,
-            replace_with_date="<here-is-date>",
-            replace_with_bracket="<here-is-bracket>",
+            replace_with_date="<hereisdate>",
+            replace_with_bracket="<hereisbracket>",
         )
 
         self.assertEqual(content_processed, f1_gt_content)

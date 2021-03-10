@@ -4,6 +4,7 @@ from typing import List, Union, Generator, Tuple, Dict
 import spacy
 import stanza
 from spacy.language import Language
+from spacy.tokens import Token
 from tqdm import tqdm
 
 try:
@@ -48,8 +49,6 @@ class PartOfSpeech:
 
         for module in modules_to_disable:
             self.spacy_nlp.disable_pipe(module)
-        #
-        # self.spacy_nlp.add_pipe('senter')
 
     def process(
             self,
@@ -58,9 +57,10 @@ class PartOfSpeech:
             batch_size: int,
             pos_replacement_list: Union[Dict[str, str], None] = None,
             token_replacement_list: Union[Dict[str, str], None] = None,
-            return_docs: bool = False
-    ) -> Union[Generator[Tuple[List[str], List[str]], None, None], Generator[
-        Tuple[List[List[str]], List[List[str]]], None, None]]:
+            return_docs: bool = False,
+            return_string_tokens: bool = False
+    ) -> Union[Generator[Tuple[List[Union[Token, str]], List[str]], None, None], Generator[
+        Tuple[List[List[Union[Token, str]]], List[List[str]]], None, None]]:
         """
         Main processing function. First step is to tokenize a list of input texts to sentences and then to the tokens.
         Then such input goes to the StanzaNLP.
@@ -69,7 +69,15 @@ class PartOfSpeech:
         in a list is a document (SpaCy logic in pipelines). In such case You can specify if You want to
         return texts in structure documents[sentences[tokens]] or sentences[tokens] (removing the documents layer).
 
-        # todo better describe pos and token replacement lists
+        Sometimes You want to force POS tagger to assign POS tag to a specified token or instead of other POS tag. For
+        such cases You can use *pos_replacement_list* and *token_replacement_list*. You can import sample token and POS
+        replacement lists from MordinezNLP.utils.pos_replacement_list and MordinezNLP.utils.token_replacement_list.
+
+        If You want to use a special attributes for each tokens from SpaCy please pass *False* as a value of *return_string_tokens*
+        argument.
+
+        Each token parsed by SpaCy tokenizer will by converted to its normal version. For example each *n't* will be replaced
+        by *not*.
 
         Args:
             texts (List[str]): an input texts, each item in a list is a document (SpaCy logic in pipelines)
@@ -80,9 +88,11 @@ class PartOfSpeech:
             token_replacement_list: If not None function will replace each POS tag with the value set in value field of
             the dict. Each key is token, which will be replaced by its value.
             return_docs (bool): If True function will keep a "documents" layer on output.
+            return_string_tokens (bool): Function can return tokens as SpaCy Token object (if You need to access token
+            specified data such as norm_) or can return tokens as a string object. If True returns a string tokens.
 
         Returns:
-            Union[Generator[Tuple[List[str], List[str]], None, None], Generator[Tuple[List[List[str]], List[List[str]]],
+            Union[Generator[Tuple[List[Union[Token, str]], List[str]], None, None], Generator[Tuple[List[List[Union[Token, str]]], List[List[str]]],
             None, None]]: a list of doc(if return docs is set) with list of sentences with list of tokens and its pos tags.
         """
         sentences: List[List[str]] = []
@@ -97,11 +107,28 @@ class PartOfSpeech:
             n_process=threads,
             batch_size=batch_size
         )
+
+        raw_sentences_with_tokens: List[List[Token]] = []
+
         for doc_num, doc in enumerate(tqdm(pipe, desc='Tokenizing', total=len(texts))):
             sent_begin_index = len(sentences)
             for sent_num, sent in enumerate(doc.sents):
-                sentence = [token.text for token in sent]
+                sentence = []
+                raw_sentence_tokens = []
+
+                for i, token in enumerate(sent):
+                    if token.norm_ != 'not':
+                        sentence.append(token.text)
+                    else:
+                        if i == 0:
+                            sentence.append(token.text)
+                        else:
+                            sentence.append(token.norm_)
+
+                    raw_sentence_tokens.append(token)
+
                 sentences.append(sentence)
+                raw_sentences_with_tokens.append(raw_sentence_tokens)
             sentence_to_doc_mapping.append((sent_begin_index, len(sentences)))
 
         poss: List[List[str]] = []
@@ -120,10 +147,17 @@ class PartOfSpeech:
 
         if return_docs:
             for sentence_begin_index, sentence_end_index in sentence_to_doc_mapping:
-                yield sentences[sentence_begin_index:sentence_end_index], poss[sentence_begin_index:sentence_end_index]
+                if return_string_tokens:
+                    yield sentences[sentence_begin_index:sentence_end_index], poss[sentence_begin_index:sentence_end_index]
+                else:
+                    yield raw_sentences_with_tokens[sentence_begin_index:sentence_end_index], poss[sentence_begin_index:sentence_end_index]
         else:
-            for sentence_id, sentence in enumerate(sentences):
-                yield sentence, poss[sentence_id]
+            if return_string_tokens:
+                for sentence_id, sentence in enumerate(sentences):
+                    yield sentence, poss[sentence_id]
+            else:
+                for sentence_id, sentence in enumerate(raw_sentences_with_tokens):
+                    yield sentence, poss[sentence_id]
 
 
 if __name__ == '__main__':
@@ -132,8 +166,8 @@ if __name__ == '__main__':
     nlp: Language = spacy.load('en_core_web_sm')
     nlp.tokenizer = spacy_tokenizer(nlp)
 
-    with open(os.path.join(BASE_DIR, "tests", "resources", "test_pipelines", "pos_1.txt"), encoding="utf8") as f1:
-        f1_gt_content = f1.read()
+    # with open(os.path.join(BASE_DIR, "tests", "resources", "test_pipelines", "pos_1.txt"), encoding="utf8") as f1:
+    #     f1_gt_content = f1.read()
 
     pos_tagger = PartOfSpeech(
         nlp,
@@ -142,7 +176,7 @@ if __name__ == '__main__':
 
     pos_output = pos_tagger.process(
         [
-            f1_gt_content,
+            "Hello today is <date>, tomorrow it will be <number> degrees of celcius. Remember, to dont touch the glass. It was Mike's car. Not now please.",
         ],
         4,
         30,

@@ -13,7 +13,7 @@ class TestTokenizers(unittest.TestCase):
     nlp.tokenizer = spacy_tokenizer(nlp)
 
     def test_spacy_tokenizer_case1(self):
-        tokenized_data = self.nlp('Hello today is <date>, tomorrow it will be <number> degrees of celcius.')
+        tokenized_data = self.nlp("Hello today is <date>, tomorrow it will be <number> degrees of celcius. I don't like him.")
         self.assertEqual(
             [str(token) for token in tokenized_data],
             [
@@ -30,6 +30,12 @@ class TestTokenizers(unittest.TestCase):
                 "degrees",
                 "of",
                 "celcius",
+                ".",
+                "I",
+                "do",
+                "n't",
+                "like",
+                "him",
                 "."
             ]
         )
