@@ -1,7 +1,7 @@
 name: Test and build WHL on push
 
 on:
-  pull_request:
+  push:
     branches:
       - '**'
 
