@@ -1,4 +1,5 @@
 import itertools
+import os
 import re
 from concurrent.futures.thread import ThreadPoolExecutor
 from itertools import repeat
@@ -8,6 +9,8 @@ from typing import List, Callable, Union
 import spacy
 from cleantext import clean
 from tqdm import tqdm
+
+from helper import BASE_DIR
 
 try:
     from src.MordinezNLP.pipelines import PartOfSpeech
@@ -421,7 +424,11 @@ class BasicProcessor:
             replace_with_bracket: str = "<bracket>",
             replace_more: str = "<more>",
             replace_less: str = "<less>",
-            use_pos_tagging: bool = True
+            use_pos_tagging: bool = True,
+            list_processing_threads: int = 8,
+            tokenizer_threads: int = 8,
+            tokenizer_batch_size: int = 60,
+            pos_batch_size: int = 7000
     ) -> Union[str, List[str]]:
         """
         Main text processing function. It mainly uses regexes to find specified patterns in texts and replace them by
@@ -557,6 +564,11 @@ class BasicProcessor:
             replace_more (str): a special token used to replace more '>' and more or equal '>=' symbols in math texts
             replace_less (str): a special token used to replace less '<' and less or equal '<=' symbols in math texts
             use_pos_tagging (bool): if True function will use StanzaNLP & SpaCy for POS tagging and token normalization
+            list_processing_threads (int): How many threads You want to use to process List(str) which is on a input for
+            this function.
+            tokenizer_threads (int): How many threads to use during tokenization, this value is passed to the SpaCy pipeline.
+            tokenizer_batch_size (int) = Batch size to use during tokenization, this value is passed to the SpaCy pipeline.
+            pos_batch_size (int) = POS tagging batch size, be careful if You have got CUDA enabled system!
 
         Returns:
             Union[str, List[str]]: Post-processed text
@@ -699,24 +711,40 @@ class BasicProcessor:
         rules = pre_rules + rules + post_rules
 
         if type(text_to_process) is str:
-            processed_texts = BasicProcessor.__process_entity(text_to_process, rules)
+            processed_texts = BasicProcessor.__process_entity(text_to_process, rules, None)
             if use_pos_tagging:
-                processed_texts = self.pos_tag_data([processed_texts], replace_with_number)
+                processed_texts = self.pos_tag_data(
+                    [processed_texts],
+                    replace_with_number,
+                    tokenizer_threads=tokenizer_threads,
+                    tokenizer_batch_size=tokenizer_batch_size,
+                    pos_batch_size=pos_batch_size
+                )
                 processed_texts = re.sub(self.multi_tag_regex, r"\3\5\7\9\11\13\15", processed_texts[0])
             return processed_texts
         else:
-            chunks = BasicProcessor.chunk_list(text_to_process, 8)
-            with ThreadPoolExecutor(8) as ex:
-                post_processed_list = tqdm(ex.map(
+            chunks = BasicProcessor.chunk_list(text_to_process, list_processing_threads)
+            with ThreadPoolExecutor(list_processing_threads) as ex:
+                progress = tqdm(desc="Processing text list", total=len(text_to_process))
+                post_processed_list = list(ex.map(
                     BasicProcessor.__process_entity,
                     chunks,
-                    repeat(rules)
-                ), desc="Processing text list", total=len(text_to_process))
+                    repeat(rules),
+                    repeat(progress)
+                ))
+
+                progress.close()
 
             processed_texts = list(itertools.chain(*post_processed_list))
 
             if use_pos_tagging:
-                processed_texts = self.pos_tag_data(processed_texts, replace_with_number)
+                processed_texts = self.pos_tag_data(
+                    processed_texts,
+                    replace_with_number,
+                    tokenizer_threads=tokenizer_threads,
+                    tokenizer_batch_size=tokenizer_batch_size,
+                    pos_batch_size=pos_batch_size
+                )
 
                 for i, item in enumerate(processed_texts):
                     processed_texts[i] = re.sub(self.multi_tag_regex, r"\3\5\7\9\11\13\15", item)
@@ -732,7 +760,14 @@ class BasicProcessor:
             #     # print(text_num)
             # return processed_texts
 
-    def pos_tag_data(self, post_processed_data: List[str], replace_with_number: str) -> List[str]:
+    def pos_tag_data(
+            self,
+            post_processed_data: List[str],
+            replace_with_number: str,
+            tokenizer_threads: int,
+            tokenizer_batch_size: int,
+            pos_batch_size: int
+    ) -> List[str]:
         """
         A helper function to postprocess numbers tags and replace according tokens with special token. It also uses SpaCy
         tokenization to return "normal" form of tokens.
@@ -742,16 +777,21 @@ class BasicProcessor:
         Args:
             post_processed_data (List(str)): a postprocessed texts list
             replace_with_number (str): a special token to replace numbers with
+            tokenizer_threads (int): How many threads to use for tokenization
+            tokenizer_batch_size (int): Batch size for tokenization
+            pos_batch_size (int): POS tagging batch size, be careful when CUDA is availabe in Your system!
 
         Returns:
             str: postprocessed texts
         """
         pos_output = self.pos_tagger.process(
             post_processed_data,
-            4,
-            30,
+            tokenizer_threads=tokenizer_threads,
+            tokenizer_batch_size=tokenizer_batch_size,
+            pos_batch_size=pos_batch_size,
             return_docs=True,
             pos_replacement_list=self._pos_replacement_list_
+
         )
 
         outputs = []
@@ -782,7 +822,7 @@ class BasicProcessor:
         return [input_list[i::size] for i in range(size)]
 
     @staticmethod
-    def __process_entity(entity: Union[str, List[str]], rules: List[Callable]) -> Union[str, List[str]]:
+    def __process_entity(entity: Union[str, List[str]], rules: List[Callable], progress: Union[tqdm, None]) -> Union[str, List[str]]:
         """
         A multiprocessing wrapper for *process* func. Process function builds rules list and then uses this function
         to process entity (if input is a string) or to process list elements if input of *process* is a list of string.
@@ -790,6 +830,7 @@ class BasicProcessor:
         Args:
             entity (Union[str, List[str]]): a single entity to process
             rules (List[Callable]): list of lambda rules
+            progress (Union[tqdm, None]): tqdm progress bar used when processing a list of str
 
         Returns:
             Union[str, List[str]]: Processed entity
@@ -804,6 +845,9 @@ class BasicProcessor:
                 for rule in rules:
                     text = rule(text)
                 processed.append(text)
+
+                if progress is not None:
+                    progress.update()
             return processed
 
     def process_multiple_characters(self, text_to_process: str) -> str:
@@ -861,18 +905,20 @@ class BasicProcessor:
 if __name__ == '__main__':
     bp = BasicProcessor()
 
-    texts_to_process = [
-        "Hi! it is my first text written on saturday 16th january 2021",
-        "And here is my e-mail: asdfe@sdff.pl",
-        "Its a joke ofc",
-        "123123 And the last one is 3rd place",
-        "Punkt wir haben extra um 05:30 Uhr noch ein Event",
-        "GAME FOR SALEIF U AINT GOT THOSE CDS^^^^^^^^^^^^ U better slap"
-    ]
+    # texts_to_process = [
+    #     "Hi! it is my first text written on saturday 16th january 2021",
+    #     "And here is my e-mail: asdfe@sdff.pl",
+    #     "Its a joke ofc",
+    #     "123123 And the last one is 3rd place",
+    #     "Punkt wir haben extra um 05:30 Uhr noch ein Event",
+    #     "GAME FOR SALEIF U AINT GOT THOSE CDS^^^^^^^^^^^^ U better slap"
+    # ]
+    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "phase2", "ds_train_base.txt"), encoding="utf8") as f:
+        texts_to_process = f.readlines()[:5000]
 
     post_process = bp.process(
         texts_to_process,
         language='en'
     )
 
-    print(post_process)
+    # print(post_process)

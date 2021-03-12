@@ -30,11 +30,9 @@ class PartOfSpeech:
             language (str): a language code from stanza -> see https://stanfordnlp.github.io/stanza/available_models.html
         """
         self.spacy_nlp = nlp
-        self.nlp_stanza = stanza.Pipeline(
-            lang=language,
-            tokenize_pretokenized=True,
-            processors='tokenize, pos'
-        )
+        self.nlp_stanza = None
+
+        self.language = language
 
         self.pos_replacement_list = pos_replacement_list
         self.token_replacement_list = token_replacement_list
@@ -53,8 +51,9 @@ class PartOfSpeech:
     def process(
             self,
             texts: List[str],
-            threads: int,
-            batch_size: int,
+            tokenizer_threads: int = 8,
+            tokenizer_batch_size: int = 50,
+            pos_batch_size: int = 3000,
             pos_replacement_list: Union[Dict[str, str], None] = None,
             token_replacement_list: Union[Dict[str, str], None] = None,
             return_docs: bool = False,
@@ -81,8 +80,9 @@ class PartOfSpeech:
 
         Args:
             texts (List[str]): an input texts, each item in a list is a document (SpaCy logic in pipelines)
-            threads (int): How many threads You want to use in SpaCy tokenization
-            batch_size (int): Batch size for SpaCy tokenizer
+            tokenizer_threads (int): How many threads You want to use in SpaCy tokenization
+            tokenizer_batch_size (int): Batch size for SpaCy tokenizer
+            pos_batch_size (int) = Batch size for Stanza POS tagger (if enabled). Be careful! It uses GPU if cuda is available in Your system.
             pos_replacement_list (Union[Dict[str, str], None]): If not None function will replace each POS tag
             with value set in value field of the dict. Each key is a POS tag to be replaced by its value.
             token_replacement_list: If not None function will replace each POS tag with the value set in value field of
@@ -101,11 +101,21 @@ class PartOfSpeech:
         function_pos_replacement_list = self.pos_replacement_list if pos_replacement_list is None else pos_replacement_list
         function_token_replacement_list = self.token_replacement_list if token_replacement_list is None else token_replacement_list
 
+        # stanza
+        if self.nlp_stanza is None:
+            self.nlp_stanza = stanza.Pipeline(
+                lang=self.language,
+                tokenize_pretokenized=True,
+                processors='tokenize, pos',
+                pos_batch_size=pos_batch_size,
+                logging_level='CRITICAL'
+            )
+
         # tokenize
         pipe = self.spacy_nlp.pipe(
             texts,
-            n_process=threads,
-            batch_size=batch_size
+            n_process=tokenizer_threads,
+            batch_size=tokenizer_batch_size
         )
 
         raw_sentences_with_tokens: List[List[Token]] = []
@@ -134,8 +144,10 @@ class PartOfSpeech:
         poss: List[List[str]] = []
 
         # pos
+        print('POS tagging data, it can take up to couple hours, but also it can take just a seconds, everything '
+              'depends how much data You feed.')
         stanza_pipe = self.nlp_stanza(sentences)
-        for sentence in tqdm(stanza_pipe.sentences, desc='POS tagging'):
+        for sentence in stanza_pipe.sentences:
             sentence_pos = []
             for token in sentence.words:
                 if str(token.text) in function_token_replacement_list.keys():
