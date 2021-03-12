@@ -10,8 +10,6 @@ import spacy
 from cleantext import clean
 from tqdm import tqdm
 
-from helper import BASE_DIR
-
 try:
     from src.MordinezNLP.pipelines import PartOfSpeech
     from src.MordinezNLP.tokenizers import spacy_tokenizer
@@ -903,6 +901,7 @@ class BasicProcessor:
 
 
 if __name__ == '__main__':
+    from helper import BASE_DIR
     bp = BasicProcessor()
 
     # texts_to_process = [
