@@ -711,7 +711,7 @@ class BasicProcessor:
         rules = pre_rules + rules + post_rules
 
         if type(text_to_process) is str:
-            processed_texts = BasicProcessor.__process_entity(text_to_process, rules)
+            processed_texts = BasicProcessor.__process_entity(text_to_process, rules, None)
             if use_pos_tagging:
                 processed_texts = self.pos_tag_data(
                     [processed_texts],
@@ -741,9 +741,9 @@ class BasicProcessor:
                 processed_texts = self.pos_tag_data(
                     processed_texts,
                     replace_with_number,
-                    tokenizer_threads = tokenizer_threads,
-                    tokenizer_batch_size = tokenizer_batch_size,
-                    pos_batch_size = pos_batch_size
+                    tokenizer_threads=tokenizer_threads,
+                    tokenizer_batch_size=tokenizer_batch_size,
+                    pos_batch_size=pos_batch_size
                 )
 
                 for i, item in enumerate(processed_texts):
@@ -822,7 +822,7 @@ class BasicProcessor:
         return [input_list[i::size] for i in range(size)]
 
     @staticmethod
-    def __process_entity(entity: Union[str, List[str]], rules: List[Callable], progress: tqdm) -> Union[str, List[str]]:
+    def __process_entity(entity: Union[str, List[str]], rules: List[Callable], progress: Union[tqdm, None]) -> Union[str, List[str]]:
         """
         A multiprocessing wrapper for *process* func. Process function builds rules list and then uses this function
         to process entity (if input is a string) or to process list elements if input of *process* is a list of string.
@@ -830,6 +830,7 @@ class BasicProcessor:
         Args:
             entity (Union[str, List[str]]): a single entity to process
             rules (List[Callable]): list of lambda rules
+            progress (Union[tqdm, None]): tqdm progress bar used when processing a list of str
 
         Returns:
             Union[str, List[str]]: Processed entity
@@ -837,7 +838,6 @@ class BasicProcessor:
         if type(entity) is str:
             for rule in rules:
                 entity = rule(entity)
-            progress.update()
             return entity
         else:
             processed = []
@@ -845,7 +845,9 @@ class BasicProcessor:
                 for rule in rules:
                     text = rule(text)
                 processed.append(text)
-                progress.update()
+
+                if progress is not None:
+                    progress.update()
             return processed
 
     def process_multiple_characters(self, text_to_process: str) -> str:

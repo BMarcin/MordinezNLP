@@ -51,8 +51,8 @@ class PartOfSpeech:
     def process(
             self,
             texts: List[str],
-            tokenizer_threads: int,
-            tokenizer_batch_size: int,
+            tokenizer_threads: int = 8,
+            tokenizer_batch_size: int = 50,
             pos_batch_size: int = 3000,
             pos_replacement_list: Union[Dict[str, str], None] = None,
             token_replacement_list: Union[Dict[str, str], None] = None,
