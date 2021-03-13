@@ -801,7 +801,7 @@ class BasicProcessor:
                     if pos == 'NUM':
                         post_doc.append(replace_with_number + " ")
                     else:
-                        if token.text == "n't":
+                        if (token.text == "n't" and token.norm_ == 'not') or (token.text == 've' and token.norm_ == 'have'):
                             if i == 0:
                                 post_doc.append(token.text_with_ws)
                             else:
@@ -912,8 +912,10 @@ if __name__ == '__main__':
     #     "Punkt wir haben extra um 05:30 Uhr noch ein Event",
     #     "GAME FOR SALEIF U AINT GOT THOSE CDS^^^^^^^^^^^^ U better slap"
     # ]
-    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "phase2", "ds_train_base.txt"), encoding="utf8") as f:
-        texts_to_process = f.readlines()[:5000]
+    # with open(os.path.join(BASE_DIR, "benchmarks", "ds", "phase2", "ds_train_base.txt"), encoding="utf8") as f:
+    #     texts_to_process = f.readlines()[:5000]
+
+    texts_to_process = "I saw a lot of them retreating too. Some think they were wiped out. They've. There's a shot of them retreating."
 
     post_process = bp.process(
         texts_to_process,
