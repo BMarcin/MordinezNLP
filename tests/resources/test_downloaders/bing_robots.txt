@@ -7,6 +7,7 @@ Disallow:
 
 User-agent: *
 Disallow: /account/
+Disallow: /aclick
 Disallow: /amp/
 Allow: /api/maps/
 Disallow: /api/

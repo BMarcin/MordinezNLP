@@ -80,7 +80,8 @@ class TestProcessors(unittest.TestCase):
             "123123 And the last one is 3rd place",
             "Punkt wir haben extra um 05:30 Uhr noch ein Event",
             "GAME FOR SALEIF U AINT GOT THOSE CDS^^^^^^^^^^^^ U better slap",
-            "They've been there last year."
+            "They've been there last year.",
+            "ＬＯＵＤ　ＮＯＩＳＥＳ! annnnnnnnnd"
         ]
         texts_gt = [
             "Hi! it is my first text written on <date>",
@@ -89,7 +90,8 @@ class TestProcessors(unittest.TestCase):
             "<number> And the last one is <number> place",
             "Punkt wir haben extra um <number> : <number> Uhr noch ein Event",
             "GAME FOR SALEIF U AINT GOT THOSE CDS U better slap",
-            "They have been there last year."
+            "They have been there last year.",
+            "LOUD NOISES! and"
         ]
 
         processed_texts = self.bp.process(
