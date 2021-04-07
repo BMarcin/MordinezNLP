@@ -661,7 +661,7 @@ class BasicProcessor:
                 lambda x: re.sub(self.none_regex, r" \4\8 \5\9 \6\10 ", x),
             ]
 
-        # if there will be occurences where multiple characters were not reoved, uncomment this section
+        # if there will be occurences where multiple characters were not removed, uncomment this section
         # in such case there will be doubled removal of a multiplied characters
         #
         # if no_multiple_chars:
@@ -817,7 +817,8 @@ class BasicProcessor:
 
     @staticmethod
     def chunk_list(input_list: List[str], size: int) -> List[List[str]]:
-        return [input_list[i::size] for i in range(size)]
+        for i in range(0, len(input_list), size):
+            yield input_list[i:i + size]
 
     @staticmethod
     def __process_entity(entity: Union[str, List[str]], rules: List[Callable], progress: Union[tqdm, None]) -> Union[str, List[str]]:
@@ -902,6 +903,8 @@ class BasicProcessor:
 
 if __name__ == '__main__':
     from helper import BASE_DIR
+    import pandas as pd
+    import pickle
     bp = BasicProcessor()
 
     # texts_to_process = [
@@ -915,11 +918,38 @@ if __name__ == '__main__':
     # with open(os.path.join(BASE_DIR, "benchmarks", "ds", "phase2", "ds_train_base.txt"), encoding="utf8") as f:
     #     texts_to_process = f.readlines()[:5000]
 
-    texts_to_process = "I saw a lot of them retreating too. Some think they were wiped out. They've. There's a shot of them retreating."
+    # texts_to_process = "I saw a lot of them retreating too. Some think they were wiped out. They've. There's a shot of them retreating."
 
-    post_process = bp.process(
-        texts_to_process,
-        language='en'
-    )
-
+    # post_process = bp.process(
+    #     texts_to_process,
+    #     language='en',
+    #     use_pos_tagging=False
+    # )
+    #
     # print(post_process)
+
+    # mordineznlp benchmark <---------
+    ds_type = "test"
+
+    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_"+ds_type+"_postprocessed.pkl"), "rb") as f1:
+        ds = pickle.load(f1)
+
+    ds['content_processed'] = bp.process(ds['body'], language='en', use_pos_tagging=True, no_brackets=False)
+
+    special_tokens = bp.get_special_tokens()
+    special_tokens.remove("0")
+
+    replaces_sp_tokens = []
+    for sp_token in special_tokens:
+        replaces_sp_tokens.append("*" + sp_token[1:-1] + "*")
+
+    for i, token in enumerate(special_tokens):
+        ds['content_processed'] = ds['content_processed'].apply(
+            lambda x: x.replace(token, replaces_sp_tokens[i]))
+
+    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_"+ds_type+"_postprocessed2.pkl"), "wb") as f:
+        pickle.dump(ds, f)
+
+    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_"+ds_type+"_mordineznlp2.txt"), "w", encoding="utf8") as f1:
+        for i, item in tqdm(ds.iterrows(), total=len(ds)):
+            f1.write(item['content_processed'].replace("\n", " ") + "\n")
