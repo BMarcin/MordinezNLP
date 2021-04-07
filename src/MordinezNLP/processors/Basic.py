@@ -9,6 +9,7 @@ from typing import List, Callable, Union
 import spacy
 from cleantext import clean
 from tqdm import tqdm
+from ftfy import fix_text
 
 try:
     from src.MordinezNLP.pipelines import PartOfSpeech
@@ -835,12 +836,14 @@ class BasicProcessor:
             Union[str, List[str]]: Processed entity
         """
         if type(entity) is str:
+            entity = fix_text(entity)
             for rule in rules:
                 entity = rule(entity)
             return entity
         else:
             processed = []
             for text in entity:
+                text = fix_text(text)
                 for rule in rules:
                     text = rule(text)
                 processed.append(text)
