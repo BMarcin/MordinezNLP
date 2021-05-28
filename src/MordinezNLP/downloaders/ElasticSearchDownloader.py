@@ -23,6 +23,8 @@ class ElasticSearchDownloader:
             ip (str): elastic search IP
             port (int): elastic search port
             timeout (int): elastic search connection timeout
+            api_key_1 (str): First api key generated in Elastic
+            api_key_2 (str): Second api key generated in Elastic
         """
         self.ip: str = ip
         self.port: int = port
