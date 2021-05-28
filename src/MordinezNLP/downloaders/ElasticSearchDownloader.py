@@ -1,5 +1,5 @@
 from multiprocessing import Pool
-from typing import List, Iterable, Callable, Any
+from typing import List, Iterable, Callable, Any, Union
 
 from elasticsearch import Elasticsearch
 
@@ -15,7 +15,7 @@ class ElasticSearchDownloader:
     todo make tests
     """
 
-    def __init__(self, ip: str, port: int, timeout: int = 100):
+    def __init__(self, ip: str, port: int, api_key_1: str = None, api_key_2: str = None, timeout: int = 100):
         """
         Save elastic search connection data to class variables.
 
@@ -27,14 +27,21 @@ class ElasticSearchDownloader:
         self.ip: str = ip
         self.port: int = port
 
+        self.api_key_1 = api_key_1
+        self.api_key_2 = api_key_2
+
         self.client = ElasticSearchDownloader._get_es_connection(
             ip=ip,
             port=port,
-            timeout=timeout
+            timeout=timeout,
+            api_key=(
+                self.api_key_1,
+                self.api_key_1
+            )
         )
 
     @staticmethod
-    def _get_es_connection(ip: str, port: int, timeout: int) -> Elasticsearch:
+    def _get_es_connection(ip: str, port: int, timeout: int, api_key: tuple) -> Elasticsearch:
         """
         Build elastic search connection.
 
@@ -42,19 +49,25 @@ class ElasticSearchDownloader:
             ip (str): elastic search IP
             port (int): elastic search port
             timeout (int): elastic search connection timeout
+            api_key (tuple): api_keys for elastic connection
 
         Returns:
             Elasticsearch: elasti search client connection
         """
-        return Elasticsearch(
-            [
-                {
-                    'host': ip,
-                    'port': port
-                }
-            ],
-            timeout=timeout
-        )
+
+        if api_key[0] is None and api_key[1] is None:
+            return Elasticsearch(
+                hosts=ip,
+                port=port,
+                timeout=timeout
+            )
+        else:
+            return Elasticsearch(
+                hosts=ip,
+                port=port,
+                api_key=api_key,
+                timeout=timeout
+            )
 
     def get_all_available_indexes(self) -> List[str]:
         """
@@ -170,6 +183,8 @@ if __name__ == '__main__':
     body = {}
 
     ' Your own processing function for a single element '
+
+
     def processing_func(data: dict) -> str:
         if 'en' in data['_source']:
             if 'content' in data['_source']['en']:
