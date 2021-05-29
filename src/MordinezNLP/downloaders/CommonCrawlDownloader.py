@@ -4,6 +4,7 @@ import urllib.parse
 from io import BytesIO
 from itertools import repeat
 from typing import List
+from tqdm import tqdm
 
 try:
     from src.MordinezNLP.downloaders.Processors import text_data_processor, gzip_to_text_data_processor
@@ -63,7 +64,7 @@ class CommonCrawlDownloader:
         """
         # preprocess links to use BasicDownloader
         post_processed_urls = []
-        for url in self.links_to_search:
+        for url in tqdm(self.links_to_search, desc="Preprocessing urls..."):
             pre_url = urllib.parse.quote(url, safe='')
             post_url = "{base_url}/{index_name}-index?url={pre_url}&output=json".format(
                 base_url=self.base_index_url,
@@ -81,7 +82,7 @@ class CommonCrawlDownloader:
 
         # parse downloaded contents
         entries_to_download = []
-        for response_content in downloaded_content:
+        for response_content in tqdm(downloaded_content, desc="Processing downloaded content..."):
             for line in response_content.split("\n"):
                 if len(line) > 10:
                     parsed_item = json.loads(line)
@@ -117,7 +118,7 @@ class CommonCrawlDownloader:
         """
         entries_to_download = []
 
-        for entry in self.entries_to_download:
+        for entry in tqdm(self.entries_to_download, desc="Processing entries..."):
             filename = entry['filename']
             offset = int(entry['offset'])
             length = int(entry['length'])
@@ -149,7 +150,8 @@ class CommonCrawlDownloader:
             CommonCrawlDownloader._common_crawl_gzip_to_text_processor,
             custom_headers=[entry['headers'] for entry in entries_to_download],
             streamable=repeat(True),
-            sleep_time=sleep_time
+            sleep_time=sleep_time,
+            threads=self.threads
         )
 
         if not os.path.exists(save_to):
