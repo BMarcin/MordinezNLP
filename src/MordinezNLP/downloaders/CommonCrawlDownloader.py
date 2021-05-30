@@ -64,7 +64,7 @@ class CommonCrawlDownloader:
         """
         # preprocess links to use BasicDownloader
         post_processed_urls = []
-        for url in tqdm(self.links_to_search, desc="Preprocessing urls..."):
+        for url in self.links_to_search:
             pre_url = urllib.parse.quote(url, safe='')
             post_url = "{base_url}/{index_name}-index?url={pre_url}&output=json".format(
                 base_url=self.base_index_url,
@@ -82,14 +82,15 @@ class CommonCrawlDownloader:
 
         # parse downloaded contents
         entries_to_download = []
-        for response_content in tqdm(downloaded_content, desc="Processing downloaded content..."):
+        for response_content in tqdm(downloaded_content, desc="Processing URLs to download"):
             for line in response_content.split("\n"):
                 if len(line) > 10:
                     parsed_item = json.loads(line)
                     if 'mime-detected' in parsed_item.keys() and 'status' in parsed_item.keys() and \
                             'languages' in parsed_item.keys():
-                        if parsed_item['mime-detected'] == self.search_for_mime and parsed_item['status'] == "200" \
-                                and parsed_item['languages'] == self.search_for_language:
+                        if parsed_item['mime-detected'] == self.search_for_mime and (parsed_item['status'] == "200"
+                                or parsed_item['status'] == "301") and \
+                                parsed_item['languages'] == self.search_for_language:
                             entries_to_download.append(parsed_item)
         return entries_to_download
 
@@ -107,7 +108,7 @@ class CommonCrawlDownloader:
         gzipped_data = gzip_to_text_data_processor(data_in)
         return gzipped_data.strip().split("\n\n", 2)[2]
 
-    def download(self, save_to: str, base_url: str = "https://commoncrawl.s3.amazonaws.com", sleep_time: int = 0):
+    def download(self, save_to: str, base_url: str = "https://commoncrawl.s3.amazonaws.com", sleep_time: float = 0):
         """
         Main function used to download CC data using multithreaded Base Downloader.
 
@@ -117,8 +118,9 @@ class CommonCrawlDownloader:
             sleep_time (int):  A sleep time in seconds that is used to prevent sites from detecting downloading as a DDoS attack
         """
         entries_to_download = []
+        urls = []
 
-        for entry in tqdm(self.entries_to_download, desc="Processing entries..."):
+        for entry in tqdm(self.entries_to_download, desc="Extracting metadata of source URLs"):
             filename = entry['filename']
             offset = int(entry['offset'])
             length = int(entry['length'])
@@ -142,11 +144,12 @@ class CommonCrawlDownloader:
             }
 
             entries_to_download.append(entry_dict)
+            urls.append(entry_dict['url'])
 
         ' download data '
         bd = BasicDownloader()
         downloaded_content = bd.download_urls(
-            [entry['url'] for entry in entries_to_download],
+            urls,
             CommonCrawlDownloader._common_crawl_gzip_to_text_processor,
             custom_headers=[entry['headers'] for entry in entries_to_download],
             streamable=repeat(True),
@@ -165,8 +168,25 @@ class CommonCrawlDownloader:
 if __name__ == '__main__':
     ccd = CommonCrawlDownloader(
         [
-            "reddit.com/r/space/*",
-            "reddit.com/r/spacex/*",
-        ]
+            "medium.com/*",
+            "steemit.com/*",
+            "quora.com/*",
+            "write.as/*",
+            "newsbreak.com/*",
+            "hubpages.com/*",
+            "amazon.com/*",
+            "*.blog/*",
+            "cnn.com/*",
+            "*.cnn.com",
+            "bbc.com/*",
+            "nytimes.com/*",
+            "dailymail.co.uk/*",
+            "theguardian.com/*",
+            "foxnews.com/*",
+            "washingtonpost.com/*",
+            "cnbc.com/*",
+            "forbes.com/*",
+        ],
+        threads=32
     )
-    ccd.download('./test_data')
+    ccd.download('./test_data', sleep_time=0.05)

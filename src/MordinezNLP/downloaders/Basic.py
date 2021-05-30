@@ -6,6 +6,7 @@ from multiprocessing import Pool
 from typing import List, Iterable, Callable
 
 import requests
+from tqdm import tqdm
 
 try:
     from src.MordinezNLP.downloaders.Processors import text_data_processor, pdf_data_processor
@@ -26,7 +27,7 @@ class BasicDownloader:
             urls: List[str],
             file_type_handler: Callable,
             threads: int = 8,
-            sleep_time: int = 0,
+            sleep_time: float = 0,
             custom_headers: Iterable = repeat({}),
             streamable: Iterable = repeat(False),
             max_retries: int = 10
@@ -53,8 +54,9 @@ class BasicDownloader:
         Returns:
             list: A list of downloaded and processed by *file_type_handler* function files.
         """
+        print('Got {} URLs to download. Starting...'.format(str(len(urls))))
         with Pool(threads) as p:
-            downloaded_strings = p.starmap(
+            downloaded_strings = tqdm(p.starmap(
                 BasicDownloader.download_to_bytes_io, zip(
                     urls,
                     custom_headers,
@@ -62,15 +64,19 @@ class BasicDownloader:
                     repeat(sleep_time),
                     repeat(max_retries)
                 )
-            )
-            return [file_type_handler(item) for item in downloaded_strings]
+            ), desc="Downloading...")
+
+            processed_entries = []
+            for item in tqdm(downloaded_strings, desc="Handling downloaded data..."):
+                processed_entries.append(file_type_handler(item))
+            return processed_entries
 
     @staticmethod
     def download_to_bytes_io(
             url: str,
             custom_headers: dict = {},
             streamable: bool = False,
-            sleep_time: int = 0,
+            sleep_time: float = 0,
             max_retries: int = 10,
     ) -> io.BytesIO:
         """
