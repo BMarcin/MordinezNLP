@@ -146,6 +146,9 @@ class CommonCrawlDownloader:
             entries_to_download.append(entry_dict)
             urls.append(entry_dict['url'])
 
+        if not os.path.exists(save_to):
+            os.mkdir(save_to)
+
         ' download data '
         bd = BasicDownloader()
         downloaded_content = bd.download_urls(
@@ -156,9 +159,6 @@ class CommonCrawlDownloader:
             sleep_time=sleep_time,
             threads=self.threads
         )
-
-        if not os.path.exists(save_to):
-            os.mkdir(save_to)
 
         for filename, entry in zip([entry['save_to'] for entry in entries_to_download], downloaded_content):
             with open(os.path.join(save_to, filename), "w", encoding="utf8") as f:
