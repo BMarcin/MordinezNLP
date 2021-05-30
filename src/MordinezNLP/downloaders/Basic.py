@@ -66,10 +66,7 @@ class BasicDownloader:
                 )
             ), desc="Downloading...")
 
-            processed_entries = []
-            for item in tqdm(downloaded_strings, desc="Handling downloaded data..."):
-                processed_entries.append(file_type_handler(item))
-            return processed_entries
+            return [file_type_handler(item) for item in downloaded_strings]
 
     @staticmethod
     def download_to_bytes_io(
