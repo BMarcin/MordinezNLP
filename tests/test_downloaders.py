@@ -77,7 +77,7 @@ class BasicDownloaderTests(unittest.TestCase):
             2
         )
 
-        self.assertEqual(file_contents, downloaded_data)
+        self.assertEqual(file_contents, list(downloaded_data))
 
 
 class CommonCrawlDownloaderTests(unittest.TestCase):

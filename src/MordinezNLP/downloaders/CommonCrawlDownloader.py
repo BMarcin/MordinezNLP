@@ -1,5 +1,7 @@
+import io
 import json
 import os
+import time
 import urllib.parse
 from io import BytesIO
 from itertools import repeat
@@ -77,35 +79,38 @@ class CommonCrawlDownloader:
         bd = BasicDownloader()
         downloaded_content = bd.download_urls(
             post_processed_urls,
-            text_data_processor
+            text_data_processor,
+            use_memory=True
         )
 
         # parse downloaded contents
         entries_to_download = []
-        for response_content in tqdm(downloaded_content, desc="Processing URLs to download"):
+        for response_content in tqdm(downloaded_content, desc="Processing URLs to download",
+                                     total=len(post_processed_urls)):
             for line in response_content.split("\n"):
                 if len(line) > 10:
                     parsed_item = json.loads(line)
                     if 'mime-detected' in parsed_item.keys() and 'status' in parsed_item.keys() and \
                             'languages' in parsed_item.keys():
                         if parsed_item['mime-detected'] == self.search_for_mime and (parsed_item['status'] == "200"
-                                or parsed_item['status'] == "301") and \
+                                                                                     or parsed_item[
+                                                                                         'status'] == "301") and \
                                 parsed_item['languages'] == self.search_for_language:
                             entries_to_download.append(parsed_item)
         return entries_to_download
 
     @staticmethod
-    def _common_crawl_gzip_to_text_processor(data_in: BytesIO) -> str:
+    def _common_crawl_gzip_to_text_processor(data_in: bytes) -> str:
         """
         Function is a wrapper for *gzip_to_text_data_processor*. For CC gzips we need to remove crawler metadata, so function strips, splits data and returs just a crawled html source.
 
         Args:
-            data_in (BytesIO): a downloaded bytes
+            data_in (bytes): a downloaded bytes
 
         Returns:
             str: Source html of crawled site.
         """
-        gzipped_data = gzip_to_text_data_processor(data_in)
+        gzipped_data = gzip_to_text_data_processor(io.BytesIO(data_in))
         return gzipped_data.strip().split("\n\n", 2)[2]
 
     def download(self, save_to: str, base_url: str = "https://commoncrawl.s3.amazonaws.com", sleep_time: float = 0):
@@ -157,35 +162,39 @@ class CommonCrawlDownloader:
             custom_headers=[entry['headers'] for entry in entries_to_download],
             streamable=repeat(True),
             sleep_time=sleep_time,
-            threads=self.threads
+            threads=self.threads,
+            use_memory=False
         )
 
+        # with tqdm(desc='Saving', total=len(urls)) as progress:
         for filename, entry in zip([entry['save_to'] for entry in entries_to_download], downloaded_content):
             with open(os.path.join(save_to, filename), "w", encoding="utf8") as f:
                 f.write(entry)
+                # progress.update()
 
 
 if __name__ == '__main__':
     ccd = CommonCrawlDownloader(
         [
-            "medium.com/*",
-            "steemit.com/*",
-            "quora.com/*",
-            "write.as/*",
-            "newsbreak.com/*",
-            "hubpages.com/*",
-            "amazon.com/*",
-            "*.blog/*",
-            "cnn.com/*",
-            "*.cnn.com",
-            "bbc.com/*",
-            "nytimes.com/*",
-            "dailymail.co.uk/*",
-            "theguardian.com/*",
-            "foxnews.com/*",
-            "washingtonpost.com/*",
-            "cnbc.com/*",
-            "forbes.com/*",
+            # "medium.com/*",
+            # "steemit.com/*",
+            # "quora.com/*",
+            # "write.as/*",
+            # "newsbreak.com/*",
+            # "hubpages.com/*",
+            # "amazon.com/*",
+            # "*.blog/*",
+            # "cnn.com/*",
+            # "*.cnn.com",
+            # "bbc.com/*",
+            # "nytimes.com/*",
+            # "dailymail.co.uk/*",
+            # "theguardian.com/*",
+            # "foxnews.com/*",
+            # "washingtonpost.com/*",
+            # "cnbc.com/*",
+            # "forbes.com/*",
+            "reddit.com/r/spacex/*"
         ],
         threads=32
     )
