@@ -148,8 +148,9 @@ class CommonCrawlDownloader:
                 'save_to': filename_to_save_entry
             }
 
-            entries_to_download.append(entry_dict)
-            urls.append(entry_dict['url'])
+            if entry_dict['url'] not in urls:
+                entries_to_download.append(entry_dict)
+                urls.append(entry_dict['url'])
 
         if not os.path.exists(save_to):
             os.mkdir(save_to)
@@ -176,6 +177,9 @@ class CommonCrawlDownloader:
 if __name__ == '__main__':
     ccd = CommonCrawlDownloader(
         [
+            "en.wikipedia.org/*",
+            # "reddit.com/r/space/*",
+            # "reddit.com/r/spacex/*",
             # "medium.com/*",
             # "steemit.com/*",
             # "quora.com/*",
@@ -194,7 +198,11 @@ if __name__ == '__main__':
             # "washingtonpost.com/*",
             # "cnbc.com/*",
             # "forbes.com/*",
-            "reddit.com/r/spacex/*"
+            # "telegraph.co.uk/*",
+            # "independent.co.uk/*",
+            # "mirror.co.uk/*",
+            # "thesun.co.uk/*",
+            # "metro.co.uk/*"
         ],
         threads=32
     )
