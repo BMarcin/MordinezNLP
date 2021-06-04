@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import List, Iterable, Callable, Union
 
 import requests
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import base64
 
 try:

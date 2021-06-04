@@ -6,7 +6,7 @@ import urllib.parse
 from io import BytesIO
 from itertools import repeat
 from typing import List
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 try:
     from src.MordinezNLP.downloaders.Processors import text_data_processor, gzip_to_text_data_processor

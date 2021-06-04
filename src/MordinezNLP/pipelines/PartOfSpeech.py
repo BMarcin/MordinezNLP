@@ -5,7 +5,7 @@ import spacy
 import stanza
 from spacy.language import Language
 from spacy.tokens import Token
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 try:
     from src.MordinezNLP.tokenizers import spacy_tokenizer

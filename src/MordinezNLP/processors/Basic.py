@@ -8,7 +8,7 @@ from typing import List, Callable, Union
 
 import spacy
 from cleantext import clean
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from ftfy import fix_text
 
 try:
