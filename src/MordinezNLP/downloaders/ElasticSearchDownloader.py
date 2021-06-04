@@ -38,7 +38,7 @@ class ElasticSearchDownloader:
             timeout=timeout,
             api_key=(
                 self.api_key_1,
-                self.api_key_1
+                self.api_key_2
             )
         )
 
