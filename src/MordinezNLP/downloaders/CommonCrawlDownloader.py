@@ -113,7 +113,10 @@ class CommonCrawlDownloader:
             str: Source html of crawled site.
         """
         gzipped_data = gzip_to_text_data_processor(io.BytesIO(data_in))
-        return gzipped_data.strip().split("\n\n", 2)[2]
+        try:
+            return gzipped_data.strip().split("\n\n", 2)[2]
+        except IndexError:
+            return ""
 
     def download(self, save_to: str, base_url: str = "https://commoncrawl.s3.amazonaws.com", sleep_time: float = 0):
         """
