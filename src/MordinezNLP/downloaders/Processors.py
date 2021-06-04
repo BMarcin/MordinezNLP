@@ -45,4 +45,10 @@ def gzip_to_text_data_processor(data: BytesIO) -> str:
     unzipped_file = gzip.GzipFile(fileobj=data)
     raw_data = unzipped_file.read()
 
-    return raw_data.decode("utf8").replace('\r\n', '\n')
+    try:
+        return raw_data.decode("utf8").replace('\r\n', '\n')
+    except UnicodeDecodeError:
+        try:
+            return raw_data.decode("ascii").replace('\r\n', '\n')
+        except UnicodeDecodeError:
+            return ""
