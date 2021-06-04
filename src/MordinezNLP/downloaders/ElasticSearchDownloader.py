@@ -2,6 +2,7 @@ from multiprocessing import Pool
 from typing import List, Iterable, Callable, Any, Union
 
 from elasticsearch import Elasticsearch
+from tqdm.auto import tqdm
 
 try:
     from src.MordinezNLP.parsers import HTML_Parser
@@ -133,6 +134,14 @@ class ElasticSearchDownloader:
         if self.client.indices.exists(index_name):
             processed_docs = []
 
+            total_docs = self.client.count(
+                index=index_name,
+                body=query
+            )
+
+            print('Found {} docs, processing...'.format(str(total_docs['count'])))
+            progress = tqdm(desc='Processing', total=total_docs['count'])
+
             data = self.client.search(
                 index=index_name,
                 scroll=scroll,
@@ -147,6 +156,8 @@ class ElasticSearchDownloader:
                 ),
                 threads=threads
             )
+
+            progress.update(scroll_size)
 
             scroll_id = data['_scroll_id']
             scroll_size = len(data['hits']['hits'])
@@ -167,6 +178,8 @@ class ElasticSearchDownloader:
 
                 scroll_id = data['_scroll_id']
                 scroll_size = len(data['hits']['hits'])
+
+                progress.update(scroll_size)
             return processed_docs
         else:
             print('{} doesn\'t exists'.format(index_name))
@@ -185,8 +198,6 @@ if __name__ == '__main__':
     body = {}
 
     ' Your own processing function for a single element '
-
-
     def processing_func(data: dict) -> str:
         if 'en' in data['_source']:
             if 'content' in data['_source']['en']:
