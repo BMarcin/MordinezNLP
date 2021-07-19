@@ -101,11 +101,11 @@ class BasicProcessor:
 
         # replace all custom tags where one exists after one to a single one, from <date> <date>    <date> -> <date>
         self.multi_tag_regex = re.compile(
-            r"(((<date>[\s,]*){2,})|((<unk>[\s,]*){2,})|((<number>[\s,]*){2,})|((<url>[\s,]*){2,})|((<email>[\s,]*){2,})|((<less>[\s,]*){2,})|((<more>[\s,]*){2,})|((<bracket>[\s,]*){2,}))",
+            r"(((<currency>[\s,]*){2,})|((<date>[\s,]*){2,})|((<unk>[\s,]*){2,})|((<number>[\s,]*){2,})|((<url>[\s,]*){2,})|((<email>[\s,]*){2,})|((<less>[\s,]*){2,})|((<more>[\s,]*){2,})|((<bracket>[\s,]*){2,}))",
             re.IGNORECASE)
         # replace special token occurences one by one with colons
         self.multi_tag_colon_regex = re.compile(
-            r"(((<date>[:]*){2,})|((<unk>[:]*){2,})|((<number>[:]*){2,})|((<url>[:]*){2,})|((<email>[:]*){2,})|((<less>[:]*){2,})|((<more>[:]*){2,})|((<bracket>[:]*){2,}))",
+            r"(((<currency>[:]*){2,})|((<date>[:]*){2,})|((<unk>[:]*){2,})|((<number>[:]*){2,})|((<url>[:]*){2,})|((<email>[:]*){2,})|((<less>[:]*){2,})|((<more>[:]*){2,})|((<bracket>[:]*){2,}))",
             re.IGNORECASE)
 
         # remove starting space
@@ -128,7 +128,7 @@ class BasicProcessor:
         # regexes used by *process_multiple_characters* function #
         self.multiple_characters_regex = re.compile(r"(.)\1{3,}")
         self.multiple_characters_non_sense = re.compile(
-            r"(<number>|<date>|<unknown>|<url>|<email>|<more>|<less>)|[,\.<>!?]", re.IGNORECASE)
+            r"(<number>|<date>|<unknown>|<url>|<email>|<more>|<less>|<currency>)|[,\.<>!?]", re.IGNORECASE)
 
         # final regex which removes double dots and newline (from HTML_Parser)
         self.double_dots = re.compile(r"\.\.\n")
@@ -704,7 +704,8 @@ class BasicProcessor:
             lambda x: x.replace("-", " "),
             lambda x: re.sub(self.space_regex, " ", x),
             lambda x: re.sub(self.multi_tag_colon_regex, r"\3\5\7\9\11\13\15 : \3\5\7\9\11\13\15", x),
-            lambda x: x.replace("e mail", "email")
+            lambda x: x.replace("e mail", "email"),
+            lambda x: x.replace("><", "> <")
         ]
 
         rules = pre_rules + rules + post_rules
@@ -905,9 +906,9 @@ class BasicProcessor:
 
 
 if __name__ == '__main__':
-    from helper import BASE_DIR
-    import pandas as pd
-    import pickle
+    # from helper import BASE_DIR
+    # import pandas as pd
+    # import pickle
     bp = BasicProcessor()
 
     # texts_to_process = [
@@ -921,38 +922,38 @@ if __name__ == '__main__':
     # with open(os.path.join(BASE_DIR, "benchmarks", "ds", "phase2", "ds_train_base.txt"), encoding="utf8") as f:
     #     texts_to_process = f.readlines()[:5000]
 
-    # texts_to_process = "I saw a lot of them retreating too. Some think they were wiped out. They've. There's a shot of them retreating."
+    texts_to_process = "It costs $20 or maybe 20$. So try this (hehe)."
 
-    # post_process = bp.process(
-    #     texts_to_process,
-    #     language='en',
-    #     use_pos_tagging=False
-    # )
-    #
-    # print(post_process)
+    post_process = bp.process(
+        texts_to_process,
+        language='en',
+        use_pos_tagging=False
+    )
+
+    print(post_process)
 
     # mordineznlp benchmark <---------
-    ds_type = "test"
-
-    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_"+ds_type+"_postprocessed.pkl"), "rb") as f1:
-        ds = pickle.load(f1)
-
-    ds['content_processed'] = bp.process(ds['body'], language='en', use_pos_tagging=True, no_brackets=False)
-
-    special_tokens = bp.get_special_tokens()
-    special_tokens.remove("0")
-
-    replaces_sp_tokens = []
-    for sp_token in special_tokens:
-        replaces_sp_tokens.append("*" + sp_token[1:-1] + "*")
-
-    for i, token in enumerate(special_tokens):
-        ds['content_processed'] = ds['content_processed'].apply(
-            lambda x: x.replace(token, replaces_sp_tokens[i]))
-
-    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_"+ds_type+"_postprocessed2.pkl"), "wb") as f:
-        pickle.dump(ds, f)
-
-    with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_"+ds_type+"_mordineznlp2.txt"), "w", encoding="utf8") as f1:
-        for i, item in tqdm(ds.iterrows(), total=len(ds)):
-            f1.write(item['content_processed'].replace("\n", " ") + "\n")
+    # ds_type = "test"
+    #
+    # with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_"+ds_type+"_postprocessed.pkl"), "rb") as f1:
+    #     ds = pickle.load(f1)
+    #
+    # ds['content_processed'] = bp.process(ds['body'], language='en', use_pos_tagging=True, no_brackets=False)
+    #
+    # special_tokens = bp.get_special_tokens()
+    # special_tokens.remove("0")
+    #
+    # replaces_sp_tokens = []
+    # for sp_token in special_tokens:
+    #     replaces_sp_tokens.append("*" + sp_token[1:-1] + "*")
+    #
+    # for i, token in enumerate(special_tokens):
+    #     ds['content_processed'] = ds['content_processed'].apply(
+    #         lambda x: x.replace(token, replaces_sp_tokens[i]))
+    #
+    # with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_"+ds_type+"_postprocessed2.pkl"), "wb") as f:
+    #     pickle.dump(ds, f)
+    #
+    # with open(os.path.join(BASE_DIR, "benchmarks", "ds", "ds_"+ds_type+"_mordineznlp2.txt"), "w", encoding="utf8") as f1:
+    #     for i, item in tqdm(ds.iterrows(), total=len(ds)):
+    #         f1.write(item['content_processed'].replace("\n", " ") + "\n")

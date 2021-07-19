@@ -72,7 +72,7 @@ if __name__ == '__main__':
     nlp.tokenizer = spacy_tokenizer(nlp)
 
     test_doc = nlp(
-        'Hello today is <date>, tomorrow it will be <number> degrees of celcius. Remember, to don\'t touch the glass.')
+        'Hello today is <date>, tomorrow it will be <number> degrees of celcius. Remember, to don\'t touch the glass. <currency> <number>')
 
     for token in test_doc:
         print(token.norm_)
