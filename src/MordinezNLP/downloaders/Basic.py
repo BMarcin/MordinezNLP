@@ -5,6 +5,8 @@ import time
 from itertools import repeat
 from multiprocessing import Pool
 from pathlib import Path
+from collections import Counter
+from pprint import pprint
 
 from typing import List, Iterable, Callable, Union
 
@@ -65,6 +67,12 @@ class BasicDownloader:
             list: A list of downloaded and processed by *file_type_handler* function files.
         """
         # print('Got {} URLs to download. Starting...'.format(str(len(urls))))
+
+        cc = Counter(urls)
+        if any([True for url in cc.keys() if cc[url] != 1]):
+            pprint([url for url in cc.keys() if cc[url] != 1])
+            raise Exception("There are some duplicates in urls")
+
         temp_path = Path("./.temp/download-{}".format(time.strftime("%Y%m%d-%H%M%S")))
         if not use_memory:
             temp_path.mkdir(parents=True)
