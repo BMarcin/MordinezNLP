@@ -37,7 +37,8 @@ class BasicDownloader:
             custom_headers: Iterable = repeat({}),
             streamable: Iterable = repeat(False),
             max_retries: int = 10,
-            use_memory: bool = True
+            use_memory: bool = True,
+            temp_dir: Union[Path, None] = None
     ) -> list:
         """
         Function allows user to download files from provided URLs in list. Each file is downloaded as BytesIO using
@@ -62,6 +63,7 @@ class BasicDownloader:
             custom_headers (int): Refer to *download_to_bytes_io* function documentation.
             use_memory (bool): Downloader can download files to memory or to the binary files. Use memory downloader
             when You know that You will download small amout of data, otherwise set this value to False.
+            temp_dir (Path): Path to directory where temporary files will be saved.
 
         Returns:
             list: A list of downloaded and processed by *file_type_handler* function files.
@@ -73,7 +75,10 @@ class BasicDownloader:
             pprint([url for url in cc.keys() if cc[url] != 1])
             raise Exception("There are some duplicates in urls")
 
-        temp_path = Path("./.temp/download-{}".format(time.strftime("%Y%m%d-%H%M%S")))
+        if temp_dir is None:
+            temp_path = Path("./.temp/download-{}".format(time.strftime("%Y%m%d-%H%M%S")))
+        else:
+            temp_path = temp_dir / Path(".temp/download-{}".format(time.strftime("%Y%m%d-%H%M%S")))
         if not use_memory:
             temp_path.mkdir(parents=True)
             t1 = threading.Thread(target=BasicDownloader.tqdm_downloading_progress, args=(
