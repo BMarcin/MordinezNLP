@@ -21,10 +21,10 @@ class DateTagger:
         # en dates
         self.en_dates = re.compile(r"(((early|late)\s*\d{2,4}s*)|(in\s+\d{2}s))", re.IGNORECASE)
         self.en_dates_combined = re.compile(
-            r"((" + "|".join(DataTagger.get_language_day_names(language)) + ")*\s*((" + "|".join(
-                DataTagger.get_date_ordinals(
+            r"((" + "|".join(DateTagger.get_language_day_names(language)) + ")*\s*((" + "|".join(
+                DateTagger.get_date_ordinals(
                     language)) + ")|(0*([1-9]{1,2})(st|nd|rd|th)*))\s+(of\s+)*(" + "|".join(
-                DataTagger.get_language_month_names(language) + [month[:3] for month in DataTagger.get_language_month_names(
+                DateTagger.get_language_month_names(language) + [month[:3] for month in DateTagger.get_language_month_names(
                     language)]) + "))\s*(in\s+)*\d{0,4}s*", re.IGNORECASE)
         # print(self.en_dates_combined.pattern)
         self.en_dates_combined2 = re.compile(
@@ -138,7 +138,7 @@ class DateTagger:
             List[str]: a list of ordinals in specified language
         """
         if language == 'en':
-            base_numerals = DataTagger.get_numerals(language)
+            base_numerals = DateTagger.get_numerals(language)
             ordinals_base = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth']
             ordinals = ordinals_base[:]
 
@@ -171,7 +171,7 @@ class DateTagger:
         """
         if language == 'en':
             to_return = []
-            for ordinal in DataTagger.get_ordinals(language)[:31]:
+            for ordinal in DateTagger.get_ordinals(language)[:31]:
                 if ' ' in ordinal:
                     to_return.append(ordinal.replace(' ', ''))
 
@@ -209,7 +209,7 @@ class DateTagger:
 
 # if __name__ == '__main__':
     #     print('main')
-    # tagger = DataTagger('en')
+    # tagger = DateTagger('en')
     # print(tagger.tag_dates("22.08.2022, 31st May 2022,"))
 
 #     sample_text = "This is my sample text containg dates. " \
@@ -227,8 +227,8 @@ class DateTagger:
 
 # print(tagger.common_dates)
 # print(tagger.common_dates_combined)
-# print(DataTagger.get_language_day_names('en'))
-# print(DataTagger.get_language_month_names('en'))
-# print(DataTagger.get_numerals('en'))
-# print(DataTagger.get_ordinals('en'))
-# print(DataTagger.get_date_ordinals('en'))
+# print(DateTagger.get_language_day_names('en'))
+# print(DateTagger.get_language_month_names('en'))
+# print(DateTagger.get_numerals('en'))
+# print(DateTagger.get_ordinals('en'))
+# print(DateTagger.get_date_ordinals('en'))
