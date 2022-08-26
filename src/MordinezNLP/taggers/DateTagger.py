@@ -39,7 +39,7 @@ class DateTagger:
         self.en_dates_combined3 = re.compile(
             r"((" + "|".join(DateTagger.get_language_month_names(language) + [month[:3] for month in
                                                                               DateTagger.get_language_month_names(
-                                                                                  language)]) + ")(([./\-\s])|(, ))\d{1,2}([./\-\s]((\d{4})|(\d{2})))?)",
+                                                                                  language)]) + ")((([./\-\s])|(, ))\d{1,2})?([./\-\s]((\d{4})|(\d{2}))))",
             re.IGNORECASE
         )
 
@@ -227,6 +227,7 @@ if __name__ == '__main__':
     print(tagger.tag_dates("22.08.2022, 31st May 2022,"))
     print(tagger.tag_dates("September/25/2020"))
     print(tagger.tag_dates("December, 23 1980"))
+    print(tagger.tag_dates("December 1920"))
 
 #     sample_text = "This is my sample text containg dates. " \
 #     "I was born on the 1st of January, and I am currently in the 2nd of February. " \
