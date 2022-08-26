@@ -3,7 +3,7 @@ import re
 from typing import List
 
 
-class DataTagger:
+class DateTagger:
     def __init__(self, language: str = 'en'):
         self.language = language
         assert language in ['en'], 'Language not supported'
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     tagger = DataTagger('en')
     print(tagger.tag_dates("22.08.2022, 31st May 2022,"))
     print(tagger.tag_dates("September/25/2020"))
-    print(tagger.tag_dates("September 25 2020"))
+    print(tagger.tag_dates("Sep 25 2020"))
 
 #     sample_text = "This is my sample text containg dates. " \
 #     "I was born on the 1st of January, and I am currently in the 2nd of February. " \
