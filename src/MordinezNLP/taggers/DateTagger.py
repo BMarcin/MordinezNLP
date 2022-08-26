@@ -3,7 +3,7 @@ import re
 from typing import List
 
 
-class DateTagger:
+class DataTagger:
     def __init__(self, language: str = 'en'):
         self.language = language
         assert language in ['en'], 'Language not supported'
@@ -16,19 +16,31 @@ class DateTagger:
 
         # ==== DATES SECTION ====
         # common dates - a common dates formats used in multiple languages
-        self.common_dates = re.compile(r"(^|(?<=[^\d]))((\d{1,2}[./\-]\d{1,2}[./\-](17|18|19|20|21|22)\d{2})|((17|18|19|20|21|22)\d{2}[./\-]\d{1,2}[./\-]\d{1,2})|(\d{1,2}[./\-]\d{1,2}[./\-]\d{2})|(\d{2}[./\-]\d{1,2}[./\-]\d{1,2}))($|(?=[^\d]))", re.IGNORECASE)
+        self.common_dates = re.compile(
+            r"(^|(?<=[^\d]))((\d{1,2}[./\-]\d{1,2}[./\-](17|18|19|20|21|22)\d{2})|((17|18|19|20|21|22)\d{2}[./\-]\d{1,2}[./\-]\d{1,2})|(\d{1,2}[./\-]\d{1,2}[./\-]\d{2})|(\d{2}[./\-]\d{1,2}[./\-]\d{1,2}))($|(?=[^\d]))",
+            re.IGNORECASE)
 
         # en dates
         self.en_dates = re.compile(r"(((early|late)\s*\d{2,4}s*)|(in\s+\d{2}s))", re.IGNORECASE)
         self.en_dates_combined = re.compile(
-            r"((" + "|".join(DateTagger.get_language_day_names(language)) + ")*\s*((" + "|".join(
-                DateTagger.get_date_ordinals(
+            r"((" + "|".join(DataTagger.get_language_day_names(language)) + ")*\s*((" + "|".join(
+                DataTagger.get_date_ordinals(
                     language)) + ")|(0*([1-9]{1,2})(st|nd|rd|th)*))\s+(of\s+)*(" + "|".join(
-                DateTagger.get_language_month_names(language) + [month[:3] for month in DateTagger.get_language_month_names(
-                    language)]) + "))\s*(in\s+)*\d{0,4}s*", re.IGNORECASE)
+                DataTagger.get_language_month_names(language) + [month[:3] for month in
+                                                                 DataTagger.get_language_month_names(
+                                                                     language)]) + "))\s*(in\s+)*\d{0,4}s*",
+            re.IGNORECASE)
         # print(self.en_dates_combined.pattern)
         self.en_dates_combined2 = re.compile(
             r"(February)(\s+\d{1,2}),*\s+\d{2,4}", re.IGNORECASE)
+
+        # September/25/2020
+        self.en_dates_combined3 = re.compile(
+            r"((" + "|".join(DataTagger.get_language_month_names(language) + [month[:3] for month in
+                                                                              DataTagger.get_language_month_names(
+                                                                                  language)]) + ")[./\-]\d{1,2}[./\-]((\d{4})|(\d{2})))",
+            re.IGNORECASE
+        )
 
         # aggregate language specific dates processing into a list
         self.dates = []
@@ -39,7 +51,8 @@ class DateTagger:
                 self.common_dates,
                 self.en_dates_combined,
                 self.en_dates,
-                self.en_dates_combined2
+                self.en_dates_combined2,
+                self.en_dates_combined3,
             ]
         else:
             raise Exception('Cant\'t load language specified data')
@@ -110,9 +123,9 @@ class DateTagger:
             tenths = ['ten', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety']
 
             numerals = base + \
-                tenths[0:1] + \
-                ['eleven', 'twelve', 'thirteen'] + \
-                [''.join([base_num, 'teen']) for base_num in base[3:]]
+                       tenths[0:1] + \
+                       ['eleven', 'twelve', 'thirteen'] + \
+                       [''.join([base_num, 'teen']) for base_num in base[3:]]
 
             for i, tenth in enumerate(tenths[1:]):
                 numerals += tenths[i + 1:i + 2]
@@ -138,7 +151,7 @@ class DateTagger:
             List[str]: a list of ordinals in specified language
         """
         if language == 'en':
-            base_numerals = DateTagger.get_numerals(language)
+            base_numerals = DataTagger.get_numerals(language)
             ordinals_base = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth']
             ordinals = ordinals_base[:]
 
@@ -171,7 +184,7 @@ class DateTagger:
         """
         if language == 'en':
             to_return = []
-            for ordinal in DateTagger.get_ordinals(language)[:31]:
+            for ordinal in DataTagger.get_ordinals(language)[:31]:
                 if ' ' in ordinal:
                     to_return.append(ordinal.replace(' ', ''))
 
@@ -207,10 +220,11 @@ class DateTagger:
         return sorted(list(set(found_entities) - are_in), key=lambda x: x[0][0])
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     #     print('main')
-    # tagger = DateTagger('en')
-    # print(tagger.tag_dates("22.08.2022, 31st May 2022,"))
+    tagger = DataTagger('en')
+    print(tagger.tag_dates("22.08.2022, 31st May 2022,"))
+    print(tagger.tag_dates("September/25/2020"))
 
 #     sample_text = "This is my sample text containg dates. " \
 #     "I was born on the 1st of January, and I am currently in the 2nd of February. " \
@@ -227,8 +241,8 @@ class DateTagger:
 
 # print(tagger.common_dates)
 # print(tagger.common_dates_combined)
-# print(DateTagger.get_language_day_names('en'))
-# print(DateTagger.get_language_month_names('en'))
-# print(DateTagger.get_numerals('en'))
-# print(DateTagger.get_ordinals('en'))
-# print(DateTagger.get_date_ordinals('en'))
+# print(DataTagger.get_language_day_names('en'))
+# print(DataTagger.get_language_month_names('en'))
+# print(DataTagger.get_numerals('en'))
+# print(DataTagger.get_ordinals('en'))
+# print(DataTagger.get_date_ordinals('en'))
